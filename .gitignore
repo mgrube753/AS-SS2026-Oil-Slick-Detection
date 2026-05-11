@@ -1,4 +1,36 @@
+# Python related
 .python-version
+.pyc
+.pycache/
 .env
 .vscode
 waterbench_data/
+
+# Latex related
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.log
+*.lot
+*.nav
+*.out
+*.snm
+*.run.xml
+*.synctex.gz
+*.toc
+*-SAVE-ERROR
+*.vrb
+*.lol
+*.tdo
+
+*.pdf
+*.dvi
+*.ps
+*.eps
+
+*.swp
+*.synctex(busy)

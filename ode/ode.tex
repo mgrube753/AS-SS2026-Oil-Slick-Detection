@@ -1,0 +1,120 @@
+\documentclass[sigconf]{acmart}
+\settopmatter{printacmref=false}
+\renewcommand\footnotetextcopyrightpermission[1]{}
+\acmConference[Area Seminar SS 2026]{}{July 2026}{Rostock, Germany}
+\usepackage{lipsum}
+
+\title{ODE Guide Document -- Detecting Oil Slicks}
+
+\author{Malte Grube}
+\affiliation{
+  \institution{University of Rostock}
+  \city{Rostock}
+  \country{Germany}
+}
+\email{malte.grube@uni-rostock.de}
+
+\author{Suma Gonuguntla}
+\affiliation{
+  \institution{University of Rostock}
+  \city{Rostock}
+  \country{Germany}
+}
+\email{suma.gonuguntla@uni-rostock.de}
+
+\author{Vishnu Kaivalya Gudapati}
+\affiliation{
+  \institution{University of Rostock}
+  \city{Rostock}
+  \country{Germany}
+}
+\email{vishnu.gudapati@uni-rostock.de}
+
+\begin{document}
+
+\maketitle
+
+% \begin{abstract}
+    % \lipsum[2]
+    \textbf{Guide information:} This document is based on the ODE guide proposed in the paper marked with this footnote\footnote{\url{https://www.sciencedirect.com/science/article/pii/S1364815226000599}, accessed 21/04/2026}.
+% \end{abstract}
+
+\section{Overview}
+
+\subsection{Purpose \& Problem Definition}
+\subsubsection{What is the main objective of the study (prediction, classification, explanation, etc.)?} Classification, focusing on binary detection of oil slicks in oceans using Sentinel-1 synthetic aperature radar (SAR) imagery.
+\subsubsection{What are the research questions or hypotheses addressed?} How well can deep learning detect oil slicks in Sentinel-1 SAR imagery, and how does performance change between an in-distribution random split and a geographic out-of-distribution split (Mediterranean)? An optional focus is whether a Geospatial Foundation Model (GFM) can improve over a Convolutional Neural Network (CNN) baseline, and what Explainable AI (XAI) methods reveal about the features driving predictions.
+\subsubsection{Why is ML an appropriate approach here (what alternative / statistical baselines would miss)?} Oil spills cause severe ecological damage. Furthermore, it is expensive to monitor the oceans manually. Automation through ML is essential for scalable detection and monitoring.
+\subsubsection{What is the model used for (e.g., description, explanation, prediction/mapping, identifying patterns) and what assumptions guide this choice?} Primarily for prediction (classification of oil slick presence or absence). Since SAR imagery works at night and through clouds, it is suitable for the desired task. Moreover, oil films dampen short surface waves, visible as dark patches in SAR backscatter.
+
+\subsection{Phenomenon \& Targets}
+\subsubsection{If applicable, what is the target variable (definition, unit, categories)?} An image-based binary classification label, indicating the presence (1) or absence (0) of an oil slick in a given Sentinel-1 SAR image chip.
+\subsubsection{What is the temporal and spatial scope?} ...
+\subsubsection{What assumptions or known constraints shape the study (e.g. stationarity, sampling limits)?} SAR imagery is robust to weather and lighting conditions. The key challenge is distinguishing oil slicks from ''lookalikes'', such as natural slicks, low-wind areas, or ship wakes.
+
+\subsection{Workflow Overview}
+\subsubsection{What are the main steps from raw data to results (high-level summary)?}
+\subsubsection{Which software, versions, and computational environment are used?}
+\subsubsection{How is reproducibility ensured (random seeds, version control)?}
+Version control is maintained through GitHub\footnote{\url{https://github.com/mgrube753/AS-SS2026-Oil-Slick-Detection.git}, accessed 11/05/2026}.
+
+\section{Data}
+
+\subsection{Source data \& Accessibility}
+\subsubsection{What are the data types (e.g., images, text, measurements, etc.) and their sources (e.g., personal datasets, excavation records, etc.)?} The source of the data is the OilSlick subset of the WaterBench dataset, and it consists of images and tabular metadata. The imagery is based on 2-band GeoTIFFs from Sentinel-1 SAR, with VV and VH backscatter channels. Metadata is provided in CSV and JSON formats.
+\subsubsection{Are the source data (i.e., raw data) used for the study openly accessible and / or published? If so, where?} Yes, openly accessible on Hugging Face\footnote{\url{https://huggingface.co/datasets/ayushprd/WaterBench}, accessed 01/05/2026}.
+\subsubsection{What licenses, permissions, and ethical considerations apply?}
+\subsubsection{How representative are the data (coverage, gaps) and what known biases may affect inference?} ...
+
+\subsection{Structure \& Quality}
+\subsubsection{How large is the dataset (records, features, classes)?}
+\subsubsection{What known data issues exist (measurement error, noise, missing values, duplicates), and what quality control checks were applied (validation, cleaning, filtering)?}
+
+\subsection{Exploratory Description}
+\subsubsection{What descriptive summaries (distributions, correlations, outliers) were made to understand the data before modeling?}
+\subsubsection{Is an Exploratory Data Analysis (EDA) available? If so, where?}
+
+\subsection{Splitting (anti-leakage)}
+\subsubsection{How were the training, validation, and test splits defined (randomly, by time, by region, by group)?} Two splits are defined: (1) a random split for in-distribution data, and (2) a geographic split with the Mediterranean as an out-of-distribution set.
+\subsubsection{How was overlap or ``leakage'' between these sets avoided?} By using the \texttt{splits/random/} and \texttt{splits/geographic/} folders, containing pre-defined split TXT files to avoid any overlap or leakage.
+\subsubsection{What share of the data went into each set (e.g., 80\% train set, 20\% test set)?} The random split is structured as follows: 900 Train, 150 Validation, 300 Test data. The geographic split is structured slightly differently: 864 Train, 217 Validation, 150 Test.
+\subsection{Preprocessing \& Features}
+\subsubsection{What preprocessing steps were applied (encoding, scaling, normalization, imputation), and where were they fitted (i.e., before or after the dataset splitting)?} Each Sentinel-1 SAR image chip is normalized by using z-score on VV and VH backscatter channels in dB. This is done after splitting to prevent data leakage.
+\subsubsection{What features were engineered and why?}
+\subsubsection{How were collinearity and redundancy checked (e.g., correlation matrices, feature importance, Variance Inflation Factor)?}
+\subsubsection{Was dimensionality reduction used, and if so, how and when?}
+
+\section{Execution}
+
+\subsection{Model Choice}
+\subsubsection{Which candidate algorithms or model families were considered, and why?} On the one hand, a standard image-classification CNN (ResNet-50) is adapted for 2-channel input as a baseline. On the other hand, TerraMind, a pre-trained GFM, is considered to assess improvements.
+\subsubsection{Which final model(s) were selected, and on what grounds (performance, interpretability, resource efficiency)?}
+
+\subsection{Training Protocol}
+\subsubsection{What objective function(s) and weighting schemes were used?} Binary cross-entropy loss, potentially with class weighting since the dataset is imbalanced.
+\subsubsection{How were hyperparameters tuned (grid, random, Bayesian, CV design)?}
+\subsubsection{What measures were taken to stop the model from overfitting (e.g., regularization penalties, early stopping during training)?}
+
+\subsection{Evaluation \& Baselines}
+\subsubsection{What key results have been obtained?}
+\subsubsection{Which metrics were chosen (primary and secondary), and why?} Accuracy, F1 score, and AUROC are used for evaluating binary classification performance robustly across splits.
+\subsubsection{How do validation / test results support claims?}
+\subsubsection{What steps were taken to check overfitting / underfitting?}
+\subsubsection{How was uncertainty quantified or assessed (data, parameters, algorithms, scenarios)?}
+
+\subsection{Interpretation \& Limits}
+\subsubsection{How were results interpreted (feature importance, SHAP value, partial dependence, etc.)?}
+\subsubsection{Do findings align with domain knowledge, and were plausibility checks performed (e.g., expert review, comparison to external knowledge)?}
+\subsubsection{What are the known limitations, failure modes, generalization caveats, and conditions for reliable use?}
+\subsubsection{What ethical or societal issues arise from this study?}
+
+\subsection{FAIR Data, Code and Models}
+\subsubsection{How are the produced data, code, and models made findable? (DOIs, metadata, and delivery form, such as API or software package)}
+\subsubsection{How are they made Accessible? (Trusted repositories, terms of use)}
+\subsubsection{How are they made Interoperable? (Community standards, open formats)}
+\subsubsection{How are they made reusable? (Documentation, licensing)}
+\subsubsection{How is the source of the model documented (history, reuse of prior models, data sources)?}
+\subsubsection{How are all contributors acknowledged or credited (e.g., CRediT taxonomy)?}
+\subsubsection{Who are the intended audiences, and how was documentation adapted to them?}
+
+\end{document}
