@@ -1,1 +1,9 @@
 huggingface_hub
+scipy
+ipykernel
+jupyterlab
+matplotlib
+numpy
+pandas
+rasterio
+seaborn

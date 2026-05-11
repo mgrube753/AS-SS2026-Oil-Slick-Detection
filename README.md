@@ -19,7 +19,7 @@ What's needed?
     ```
 
 2. Create a virtual environment (recommended):
-   _I am using pyenv for managing several Python versions for different projects. You can also use `venv` or `conda` if you prefer._
+   _I am using pyenv for managing several Python versions for different projects. You can also use `venv` or `conda` if you prefer. Best practise: using Python 3.12.4 together._
 
     venv example:
 
