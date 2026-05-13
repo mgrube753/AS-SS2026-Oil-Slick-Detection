@@ -7,3 +7,7 @@ numpy
 pandas
 rasterio
 seaborn
+torch
+terratorch
+tifffile
+imagecodecs

@@ -2,6 +2,7 @@
 .python-version
 .pyc
 .pycache/
+__pycache__/
 .env
 .vscode
 10_waterbench_data/*

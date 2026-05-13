@@ -49,12 +49,12 @@
 
 \subsection{Phenomenon \& Targets}
 \subsubsection{If applicable, what is the target variable (definition, unit, categories)?} An image-based binary classification label, indicating the presence (1) or absence (0) of an oil slick in a given Sentinel-1 SAR image chip.
-\subsubsection{What is the temporal and spatial scope?} ...
+\subsubsection{What is the temporal and spatial scope?} The spatial scope includes the Mediterranean Sea as an out-of-distribution test set in the geographic split. The temporal scope is not explicitly defined, but the dataset includes SAR imagery from 2015 to 2020.
 \subsubsection{What assumptions or known constraints shape the study (e.g. stationarity, sampling limits)?} SAR imagery is robust to weather and lighting conditions. The key challenge is distinguishing oil slicks from ''lookalikes'', such as natural slicks, low-wind areas, or ship wakes.
 
 \subsection{Workflow Overview}
 \subsubsection{What are the main steps from raw data to results (high-level summary)?}
-\subsubsection{Which software, versions, and computational environment are used?}
+\subsubsection{Which software, versions, and computational environment are used?} python with torch and torchvision. for terramind, terratorch was used
 \subsubsection{How is reproducibility ensured (random seeds, version control)?}
 Version control is maintained through GitHub\footnote{\url{https://github.com/mgrube753/AS-SS2026-Oil-Slick-Detection.git}, accessed 11/05/2026}.
 
@@ -67,19 +67,19 @@ Version control is maintained through GitHub\footnote{\url{https://github.com/mg
 \subsubsection{How representative are the data (coverage, gaps) and what known biases may affect inference?} ...
 
 \subsection{Structure \& Quality}
-\subsubsection{How large is the dataset (records, features, classes)?}
+\subsubsection{How large is the dataset (records, features, classes)?} The dataset contains 1363 total samples, based on 2 classes (oil slick presence vs. absence). The metadata include \textcolor{red}{TODO} features, with variables such as \textcolor{red}{TODO}.
 \subsubsection{What known data issues exist (measurement error, noise, missing values, duplicates), and what quality control checks were applied (validation, cleaning, filtering)?}
 
 \subsection{Exploratory Description}
-\subsubsection{What descriptive summaries (distributions, correlations, outliers) were made to understand the data before modeling?}
-\subsubsection{Is an Exploratory Data Analysis (EDA) available? If so, where?}
+\subsubsection{What descriptive summaries (distributions, correlations, outliers) were made to understand the data before modeling?} Talk about what is to be seen in the notebook.
+\subsubsection{Is an Exploratory Data Analysis (EDA) available? If so, where?} An EDA notebook is available in the GitHub repository\footnote{\url{https://github.com/mgrube753/AS-SS2026-Oil-Slick-Detection/tree/main/20_data_analysis}, accessed 13/05/2026}.
 
 \subsection{Splitting (anti-leakage)}
 \subsubsection{How were the training, validation, and test splits defined (randomly, by time, by region, by group)?} Two splits are defined: (1) a random split for in-distribution data, and (2) a geographic split with the Mediterranean as an out-of-distribution set.
 \subsubsection{How was overlap or ``leakage'' between these sets avoided?} By using the \texttt{splits/random/} and \texttt{splits/geographic/} folders, containing pre-defined split TXT files to avoid any overlap or leakage.
 \subsubsection{What share of the data went into each set (e.g., 80\% train set, 20\% test set)?} The random split is structured as follows: 900 Train, 150 Validation, 300 Test data. The geographic split is structured slightly differently: 864 Train, 217 Validation, 150 Test.
 \subsection{Preprocessing \& Features}
-\subsubsection{What preprocessing steps were applied (encoding, scaling, normalization, imputation), and where were they fitted (i.e., before or after the dataset splitting)?} Each Sentinel-1 SAR image chip is normalized by using z-score on VV and VH backscatter channels in dB. This is done after splitting to prevent data leakage.
+\subsubsection{What preprocessing steps were applied (encoding, scaling, normalization, imputation), and where were they fitted (i.e., before or after the dataset splitting)?} Each Sentinel-1 SAR image chip is normalized by using z-score on VV and VH backscatter channels in dB. This is done after splitting to prevent data leakage. Each channel is scaled to 224x224 pixels, and the two channels are stacked to create a 2-channel input tensor for the models.
 \subsubsection{What features were engineered and why?}
 \subsubsection{How were collinearity and redundancy checked (e.g., correlation matrices, feature importance, Variance Inflation Factor)?}
 \subsubsection{Was dimensionality reduction used, and if so, how and when?}
@@ -88,7 +88,7 @@ Version control is maintained through GitHub\footnote{\url{https://github.com/mg
 
 \subsection{Model Choice}
 \subsubsection{Which candidate algorithms or model families were considered, and why?} On the one hand, a standard image-classification CNN (e.g., ResNet-18 or ResNet-50) is adapted for 2-channel input as a baseline. On the other hand, TerraMind, a pre-trained GFM, is considered to assess improvements.
-\subsubsection{Which final model(s) were selected, and on what grounds (performance, interpretability, resource efficiency)?} As the baseline, the ResNet-50 CNN is selected for its established performance in image classification. According to non-baseline models, TerraMind is selected to discover if the GFM's pre-training on geospatial data boosts performance for this specific task.
+\subsubsection{Which final model(s) were selected, and on what grounds (performance, interpretability, resource efficiency)?} As the baseline, the ResNet-50 CNN is selected for its established performance in image classification, using the pre-trained \texttt{IMAGENET1K\_V2} weights in \texttt{ResNet50\_Weights}. According to non-baseline models, TerraMind as \texttt{terramind\_v1\_small} is selected to discover if the GFM's pre-training on geospatial data boosts performance for this specific task, using its \texttt{S1GRD} modality.
 
 \subsection{Training Protocol}
 \subsubsection{What objective function(s) and weighting schemes were used?} Binary cross-entropy loss, potentially with class weighting since the dataset is imbalanced.
