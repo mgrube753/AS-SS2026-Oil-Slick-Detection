@@ -28,7 +28,7 @@ What's needed?
     source .venv/bin/activate  # On Windows: .venv\Scripts\activate
     ```
 
-3. Install dependencies
+3. In your environment, install dependencies
 
     ```bash
     pip install -r requirements.txt
@@ -36,7 +36,7 @@ What's needed?
 
 ## Usage
 
-1. Download the OilSlick dataset subset from Hugging Face by running the `download_data.sh` script from the repository root directory:
+1. While being in your environment, download the OilSlick dataset subset from Hugging Face by running the `download_data.sh` script from the repository root directory:
 
     ```bash
     ./download_data.sh
@@ -44,7 +44,7 @@ What's needed?
 
     The progress bar updates are feeling very delayed, but the download is actually progressing. Please be patient.
 
-2. Run the `extract_data.sh` script to unpack the dataset properly:
+2. Then, run the `extract_data.sh` script to unpack the dataset properly:
 
     ```bash
     ./extract_data.sh

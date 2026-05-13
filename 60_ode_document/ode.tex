@@ -87,8 +87,8 @@ Version control is maintained through GitHub\footnote{\url{https://github.com/mg
 \section{Execution}
 
 \subsection{Model Choice}
-\subsubsection{Which candidate algorithms or model families were considered, and why?} On the one hand, a standard image-classification CNN (ResNet-50) is adapted for 2-channel input as a baseline. On the other hand, TerraMind, a pre-trained GFM, is considered to assess improvements.
-\subsubsection{Which final model(s) were selected, and on what grounds (performance, interpretability, resource efficiency)?}
+\subsubsection{Which candidate algorithms or model families were considered, and why?} On the one hand, a standard image-classification CNN (e.g., ResNet-18 or ResNet-50) is adapted for 2-channel input as a baseline. On the other hand, TerraMind, a pre-trained GFM, is considered to assess improvements.
+\subsubsection{Which final model(s) were selected, and on what grounds (performance, interpretability, resource efficiency)?} As the baseline, the ResNet-50 CNN is selected for its established performance in image classification. According to non-baseline models, TerraMind is selected to discover if the GFM's pre-training on geospatial data boosts performance for this specific task.
 
 \subsection{Training Protocol}
 \subsubsection{What objective function(s) and weighting schemes were used?} Binary cross-entropy loss, potentially with class weighting since the dataset is imbalanced.

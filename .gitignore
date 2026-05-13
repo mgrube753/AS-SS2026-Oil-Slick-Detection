@@ -4,7 +4,8 @@
 .pycache/
 .env
 .vscode
-waterbench_data/
+10_waterbench_data/*
+!10_waterbench_data/.gitkeep
 
 # Latex related
 *.aux
