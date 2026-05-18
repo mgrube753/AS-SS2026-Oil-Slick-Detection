@@ -67,7 +67,7 @@ Version control is maintained through GitHub\footnote{\url{https://github.com/mg
 \subsubsection{How representative are the data (coverage, gaps) and what known biases may affect inference?} ...
 
 \subsection{Structure \& Quality}
-\subsubsection{How large is the dataset (records, features, classes)?} The dataset contains 1363 total samples, based on 2 classes (oil slick presence vs. absence). The metadata include \textcolor{red}{TODO} features, with variables such as \textcolor{red}{TODO}.
+\subsubsection{How large is the dataset (records, features, classes)?} The dataset contains 1363 total samples, based on 2 classes (oil slick presence vs. absence). The metadata include 24 features, with variables such as \texttt{center\_lon}, \texttt{center\_lat}, \texttt{cloud\_cover}, etc.
 \subsubsection{What known data issues exist (measurement error, noise, missing values, duplicates), and what quality control checks were applied (validation, cleaning, filtering)?}
 
 \subsection{Exploratory Description}
@@ -93,7 +93,7 @@ Version control is maintained through GitHub\footnote{\url{https://github.com/mg
 \subsection{Training Protocol}
 \subsubsection{What objective function(s) and weighting schemes were used?} Binary cross-entropy loss, potentially with class weighting since the dataset is imbalanced.
 \subsubsection{How were hyperparameters tuned (grid, random, Bayesian, CV design)?}
-\subsubsection{What measures were taken to stop the model from overfitting (e.g., regularization penalties, early stopping during training)?}
+\subsubsection{What measures were taken to stop the model from overfitting (e.g., regularization penalties, early stopping during training)?} Dropout layers in each modified classification head, and early stopping based on validation loss with a patience of \textcolor{red}{TODO} epochs. L2 regularization is also applied by using Adam. To create more training data, data augmentation is applied by using \textcolor{red}{TODO} ...
 
 \subsection{Evaluation \& Baselines}
 \subsubsection{What key results have been obtained?}
@@ -103,7 +103,8 @@ Version control is maintained through GitHub\footnote{\url{https://github.com/mg
 \subsubsection{How was uncertainty quantified or assessed (data, parameters, algorithms, scenarios)?}
 
 \subsection{Interpretation \& Limits}
-\subsubsection{How were results interpreted (feature importance, SHAP value, partial dependence, etc.)?}
+\subsubsection{How were results interpreted (feature importance, SHAP value, partial dependence, etc.)?} For the CNN baseline, Grad-CAM is used to visualize which regions of the SAR images drive the ResNet-50's predictions most. For TerraMind, no specific XAI method is applied, due to time constraints, but future work could explore attention maps or similar techniques to understand the GFM's decision-making process.
+
 \subsubsection{Do findings align with domain knowledge, and were plausibility checks performed (e.g., expert review, comparison to external knowledge)?}
 \subsubsection{What are the known limitations, failure modes, generalization caveats, and conditions for reliable use?}
 \subsubsection{What ethical or societal issues arise from this study?}
