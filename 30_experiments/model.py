@@ -12,7 +12,7 @@ Defines the two model classes for oil slick detection:
 
 class ResNet50Classifier(nn.Module):
     def __init__(
-        self, num_classes=2, in_channels=2, pretrained=True, freeze_backbone=False
+        self, num_classes=2, in_channels=2, pretrained=True, freeze_backbone=True
     ):
         super().__init__()
         weights = ResNet50_Weights.IMAGENET1K_V2 if pretrained else None
@@ -38,14 +38,20 @@ class ResNet50Classifier(nn.Module):
                     :, :in_channels
                 ]
 
-        self.backbone.fc = nn.Linear(self.backbone.fc.in_features, num_classes)
+        self.backbone.fc = nn.Sequential(
+            nn.Dropout(p=0.5),
+            nn.Linear(self.backbone.fc.in_features, 512),
+            nn.ReLU(),
+            nn.Dropout(p=0.3),
+            nn.Linear(512, num_classes),
+        )
 
     def forward(self, x):
         return self.backbone(x)
 
 
 class TerraMindClassifier(nn.Module):
-    def __init__(self, num_classes=2, freeze_backbone=False):
+    def __init__(self, num_classes=2, freeze_backbone=True):
         super().__init__()
         self.backbone = BACKBONE_REGISTRY.build(
             "terramind_v1_small", pretrained=True, modalities=["S1GRD"]
@@ -55,7 +61,13 @@ class TerraMindClassifier(nn.Module):
             for param in self.backbone.parameters():
                 param.requires_grad = False
 
-        self.head = nn.LazyLinear(num_classes)
+        self.head = nn.Sequential(
+            nn.Dropout(p=0.5),
+            nn.LazyLinear(512),
+            nn.ReLU(),
+            nn.Dropout(p=0.3),
+            nn.Linear(512, num_classes),
+        )
 
     def forward(self, x):
         feats = self.backbone(x)

@@ -1,6 +1,7 @@
 - [x] load VV and VH as a tensor properly, normalized via zscore
 - [ ] really ensure all imagery data is downloaded
 - [ ] add first training script
+- [ ] think about regularization techniques (early stopping, l2 reg using adam or adamW, data augmentation, dropout)
 - [ ] logging via mlflow during training, validation and testing
 - [ ] fine-tune resnet50 (changed input dims to 2; just 2 neurons in head), use binary cross entropy
 - [ ] fine-tune terramind-small with small binary head

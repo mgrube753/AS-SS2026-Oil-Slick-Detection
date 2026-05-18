@@ -60,4 +60,4 @@ def evaluate(model_name="resnet50", batch_size=16):
 
 
 if __name__ == "__main__":
-    evaluate("resnet50")
+    evaluate("terramind")
