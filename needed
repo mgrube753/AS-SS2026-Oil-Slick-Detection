@@ -1,6 +1,0 @@
-load VV and VH as a tensor properly, normalized via zscore
-logging via mlflow during training, validation and testing
-fine-tune resnet50 (changed input dims to 2; just 2 neurons in head), use binary cross entropy
-fine-tune terramind-small with small binary head
-do it for both splits each
-measure metrics (acc, pre, rec, f1, auc-roc)

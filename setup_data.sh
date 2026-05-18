@@ -16,7 +16,7 @@ fi
 echo "Starting download of the WaterBench OilSlick dataset to $TARGET_DIR..."
 
 hf download ayushprd/WaterBench --repo-type dataset \
---include 'data/OilSlick/OilSlick-images_s1-00.tar' \
+'data/OilSlick/OilSlick-images_s1-00.tar' \
 'data/OilSlick/OilSlick-images_s1-01.tar' \
 'data/OilSlick/metadata.csv' \
 'data/OilSlick/metadata.json' \
