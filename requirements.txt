@@ -11,3 +11,4 @@ torch
 terratorch
 tifffile
 imagecodecs
+folium
