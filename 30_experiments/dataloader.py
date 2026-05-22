@@ -22,6 +22,7 @@ class SARzScore:
         return torch.from_numpy(x_np)
 
 
+# Need different transforms for train (with augmentation) and val/test (without augmentation)
 def get_transform():
     return transforms.Compose(
         [SARzScore(), transforms.Resize((224, 224), antialias=True)]

@@ -11,7 +11,7 @@
 - [ ] add first initial training script
 - [ ] think about regularization techniques (early stopping, L2 reg using adam or adamW, data augmentation, dropout [done])
 - [ ] set up logging via mlflow during training, validation and testing; after this, we can train properly for both splits
-- [ ] fine-tune resnet50 (changed input dims to 2; and a proper head for binary classification)
+- [ ] fine-tune (Ayush says "from scratch"?) resnet50 (changed input dims to 2; and a proper head for binary classification)
 - [ ] fine-tune terramind-small with a proper binary head as well
 - [ ] measure metrics: acc, pre, rec, f1, auc-roc
 
