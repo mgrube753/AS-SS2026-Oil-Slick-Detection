@@ -36,14 +36,14 @@
 
 % \begin{abstract}
     % \lipsum[2]
-    \textbf{Guide information:} This document is based on the ODE guide proposed in the paper marked with this footnote\footnote{\url{https://www.sciencedirect.com/science/article/pii/S1364815226000599}, accessed 21/04/2026}.
+    \textbf{Guide information:} This document is based on the ODE guide proposed in the paper referenced in the footer below\footnote{\url{https://www.sciencedirect.com/science/article/pii/S1364815226000599}, accessed 21/04/2026}.
 % \end{abstract}
 
 \section{Overview}
 
 \subsection{Purpose \& Problem Definition}
 \subsubsection{What is the main objective of the study (prediction, classification, explanation, etc.)?} Classification, focusing on binary detection of oil slicks in oceans using Sentinel-1 synthetic aperature radar (SAR) imagery.
-\subsubsection{What are the research questions or hypotheses addressed?} How well can deep learning detect oil slicks in Sentinel-1 SAR imagery, and how does performance change between an in-distribution random split and a geographic out-of-distribution split (Mediterranean)? An optional focus is whether a Geospatial Foundation Model (GFM) can improve over a Convolutional Neural Network (CNN) baseline, and what Explainable AI (XAI) methods reveal about the features driving predictions.
+\subsubsection{What are the research questions or hypotheses addressed?} How well can deep learning detect oil slicks in Sentinel-1 SAR imagery, and how does performance change between an in-distribution random split and a geographic out-of-distribution split (Mediterranean)? An optional scope is whether a Geospatial Foundation Model (GFM) can improve over a Convolutional Neural Network (CNN) baseline, and what Explainable AI (XAI) methods reveal about the features which drive the predictions.
 \subsubsection{Why is ML an appropriate approach here (what alternative / statistical baselines would miss)?} Oil spills cause severe ecological damage. Furthermore, it is expensive to monitor the oceans manually. Automation through ML is essential for scalable detection and monitoring.
 \subsubsection{What is the model used for (e.g., description, explanation, prediction/mapping, identifying patterns) and what assumptions guide this choice?} Primarily for prediction (classification of oil slick presence or absence). Since SAR imagery works at night and through clouds, it is suitable for the desired task. Moreover, oil films dampen short surface waves, visible as dark patches in SAR backscatter.
 
@@ -61,13 +61,13 @@ Version control is maintained through GitHub\footnote{\url{https://github.com/mg
 \section{Data}
 
 \subsection{Source data \& Accessibility}
-\subsubsection{What are the data types (e.g., images, text, measurements, etc.) and their sources (e.g., personal datasets, excavation records, etc.)?} The source of the data is the OilSlick subset of the WaterBench dataset, and it consists of images and tabular metadata. The imagery is based on 2-band GeoTIFFs from Sentinel-1 SAR, with VV and VH backscatter channels. Metadata is provided in CSV and JSON formats.
+\subsubsection{What are the data types (e.g., images, text, measurements, etc.) and their sources (e.g., personal datasets, excavation records, etc.)?} The source of the data is the OilSlick subset of the WaterBench dataset, and it consists of images and tabular metadata. The imagery is based on 2-band GeoTIFFs from Sentinel-1 SAR, with VV and VH backscatter channels. Metadata is provided in CSV and JSON formats, which are primarily captured using the Sentinel-2-based dataset (optical instead of SAR).
 \subsubsection{Are the source data (i.e., raw data) used for the study openly accessible and / or published? If so, where?} Yes, openly accessible on Hugging Face\footnote{\url{https://huggingface.co/datasets/ayushprd/WaterBench}, accessed 01/05/2026}.
-\subsubsection{What licenses, permissions, and ethical considerations apply?}
+\subsubsection{What licenses, permissions, and ethical considerations apply?} The dataset is licensed under CC-BY-4.0. Permissions and ethical considerations include the free use, distribution and adaptation of the dataset, with proper attribution to the original creator. The rights of the original creator need to be respected, and any modifications must be made transparent.
 \subsubsection{How representative are the data (coverage, gaps) and what known biases may affect inference?} ...
 
 \subsection{Structure \& Quality}
-\subsubsection{How large is the dataset (records, features, classes)?} The dataset contains 1363 total samples, based on 2 classes (oil slick presence vs. absence). The metadata for Sentinel-1 SAR includes 21/24 features, with variables such as \texttt{center\_lon}, \texttt{center\_lat}, \texttt{nodata\_fraction}, etc.
+\subsubsection{How large is the dataset (records, features, classes)?} The dataset contains 1363 total samples, based on 2 classes (oil slick presence vs. absence). The metadata (primarily for Sentinel-2) includes \textcolor{red}{XX}/24 features for Sentinel-1 imagery, with variables such as \texttt{center\_lon}, \texttt{center\_lat}, \texttt{is\_valid}, etc.
 \subsubsection{What known data issues exist (measurement error, noise, missing values, duplicates), and what quality control checks were applied (validation, cleaning, filtering)?}
 
 \subsection{Exploratory Description}
@@ -79,28 +79,29 @@ Version control is maintained through GitHub\footnote{\url{https://github.com/mg
 \subsubsection{How was overlap or ``leakage'' between these sets avoided?} By using the \texttt{splits/random/} and \texttt{splits/geographic/} folders, containing pre-defined split TXT files to avoid any overlap or leakage.
 \subsubsection{What share of the data went into each set (e.g., 80\% train set, 20\% test set)?} The random split is structured as follows: 900 Train, 150 Validation, 300 Test data. The geographic split is structured slightly differently: 864 Train, 217 Validation, 150 Test.
 \subsection{Preprocessing \& Features}
-\subsubsection{What preprocessing steps were applied (encoding, scaling, normalization, imputation), and where were they fitted (i.e., before or after the dataset splitting)?} Each Sentinel-1 SAR image chip is normalized by using z-score on VV and VH backscatter channels in dB. This is done after splitting to prevent data leakage. Each channel is scaled to 224x224 pixels, and the two channels are stacked to create a 2-channel input tensor for the models.
+\subsubsection{What preprocessing steps were applied (encoding, scaling, normalization, imputation), and where were they fitted (i.e., before or after the dataset splitting)?} Each Sentinel-1 SAR image chip is normalized by using z-score on VV and VH backscatter channels in dB. This is done after splitting to prevent data leakage. Each channel is scaled to 224x224 pixels, and the two channels are stacked to create a 2-channel input tensor for the models. (Probably needs a refinement after supervisor's reply)
 \subsubsection{What features were engineered and why?}
-\subsubsection{How were collinearity and redundancy checked (e.g., correlation matrices, feature importance, Variance Inflation Factor)?}
-\subsubsection{Was dimensionality reduction used, and if so, how and when?}
+\subsubsection{How were collinearity and redundancy checked (e.g., correlation matrices, feature importance, Variance Inflation Factor)?} needed??
+\subsubsection{Was dimensionality reduction used, and if so, how and when?} No, since CNNs and GFMs can learn spatial features directly from the SAR images.
 
 \section{Execution}
 
 \subsection{Model Choice}
-\subsubsection{Which candidate algorithms or model families were considered, and why?} On the one hand, a standard image-classification CNN (e.g., ResNet-18 or ResNet-50) is adapted for 2-channel input as a baseline. On the other hand, TerraMind, a pre-trained GFM, is considered to assess improvements.
+\subsubsection{Which candidate algorithms or model families were considered, and why?} Baselines and GFMs were provided by the project supervisor. On the one hand, a standard image-classification CNN (ResNet-50) was chosen and adapted for 2-channel inputs as a training baseline. On the other hand, TerraMind, a pre-trained GFM, is considered to assess any improvements during fine-tuning.
 \subsubsection{Which final model(s) were selected, and on what grounds (performance, interpretability, resource efficiency)?} As the baseline, the ResNet-50 CNN is selected for its established performance in image classification, using the pre-trained \texttt{IMAGENET1K\_V2} weights in \texttt{ResNet50\_Weights}. According to non-baseline models, TerraMind as \texttt{terramind\_v1\_small} is selected to discover if the GFM's pre-training on geospatial data boosts performance for this specific task, using its \texttt{S1GRD} modality.
 
 \subsection{Training Protocol}
 \subsubsection{What objective function(s) and weighting schemes were used?} Binary cross-entropy loss, potentially with class weighting since the dataset is imbalanced.
 \subsubsection{How were hyperparameters tuned (grid, random, Bayesian, CV design)?}
-\subsubsection{What measures were taken to stop the model from overfitting (e.g., regularization penalties, early stopping during training)?} Dropout layers in each modified classification head, and early stopping based on validation loss with a patience of \textcolor{red}{TODO} epochs. L2 regularization is also applied by using Adam. To create more training data, data augmentation is applied by using \textcolor{red}{TODO} ...
+\subsubsection{What measures were taken to stop the model from overfitting (e.g., regularization penalties, early stopping during training)?} Dropout layers in each modified classification head, and early stopping based on validation loss with a patience of \textcolor{red}{3/4/5?} epochs. L2 regularization is also applied by using Adam. To create more training data, data augmentation is applied by using \textcolor{red}{TODO} methods.
 
 \subsection{Evaluation \& Baselines}
 \subsubsection{What key results have been obtained?}
 \subsubsection{Which metrics were chosen (primary and secondary), and why?} Accuracy, F1 score, and AUROC are used for evaluating binary classification performance robustly across splits.
 \subsubsection{How do validation / test results support claims?}
-\subsubsection{What steps were taken to check overfitting / underfitting?}
-\subsubsection{How was uncertainty quantified or assessed (data, parameters, algorithms, scenarios)?}
+\subsubsection{What steps were taken to check overfitting / underfitting?} To detect overfitting / underfitting, training and validation loss curves are logged during training to check for any divergence (overfitting) or convergence (with high loss: underfitting). The mentioned early stopping is implemented to stop training when validation loss does not improve (overfitting).
+
+\subsubsection{How was uncertainty quantified or assessed (data, parameters, algorithms, scenarios)?} By using the two given data splits (random and geographic), we can assess the models' generalization performance and robustness to these different distributions. Additionally, by using two different models (CNN baseline and GFM), we can compare their performance, regarding the GFM's potential benefits from pre-training on geospatial data.
 
 \subsection{Interpretation \& Limits}
 \subsubsection{How were results interpreted (feature importance, SHAP value, partial dependence, etc.)?} For the CNN baseline, Grad-CAM is used to visualize which regions of the SAR images drive the ResNet-50's predictions most. For TerraMind, no specific XAI method is applied, due to time constraints, but future work could explore attention maps or similar techniques to understand the GFM's decision-making process.
@@ -110,12 +111,12 @@ Version control is maintained through GitHub\footnote{\url{https://github.com/mg
 \subsubsection{What ethical or societal issues arise from this study?}
 
 \subsection{FAIR Data, Code and Models}
-\subsubsection{How are the produced data, code, and models made findable? (DOIs, metadata, and delivery form, such as API or software package)}
-\subsubsection{How are they made Accessible? (Trusted repositories, terms of use)}
-\subsubsection{How are they made Interoperable? (Community standards, open formats)}
-\subsubsection{How are they made reusable? (Documentation, licensing)}
+\subsubsection{How are the produced data, code, and models made findable? (DOIs, metadata, and delivery form, such as API or software package)} code / trained models available on the proposed github; with documentation for each python file; 
+\subsubsection{How are they made Accessible? (Trusted repositories, terms of use)} via the github and license xyz
+\subsubsection{How are they made Interoperable? (Community standards, open formats)} python/jupyter notebooks as the core; pytorch model .pt format for model checkpoints; csv for results
+\subsubsection{How are they made reusable? (Documentation, licensing)} documentation / code comments; license xyz for reuse of code and trained models
 \subsubsection{How is the source of the model documented (history, reuse of prior models, data sources)?}
 \subsubsection{How are all contributors acknowledged or credited (e.g., CRediT taxonomy)?}
-\subsubsection{Who are the intended audiences, and how was documentation adapted to them?}
+\subsubsection{Who are the intended audiences, and how was documentation adapted to them?} The primary audience are geospatial AI / ML researchers. To ensure reproducibility and clarity, the documentation shows explanations of preprocessing, architectural modifications in both models, training protocols, and evaluation metrics.
 
 \end{document}
