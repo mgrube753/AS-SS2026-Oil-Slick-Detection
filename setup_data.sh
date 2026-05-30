@@ -3,6 +3,12 @@
 TARGET_DIR=${1:-./10_waterbench_data}
 DATA_PATH="$TARGET_DIR/data/OilSlick"
 
+read -p "This script will download and set up the WaterBench OilSlick dataset from Hugging Face, but the data may not be fully available. Do you want to proceed? (y/n): " confirm
+if [[ "$confirm" != "y" ]]; then
+    echo "Aborted."
+    exit 0
+fi
+
 if [ -d "$DATA_PATH" ]; then
     read -p "Data already exists in $TARGET_DIR. Overwrite to repair? (y/n): " answer
     if [[ "$answer" != "y" ]]; then
