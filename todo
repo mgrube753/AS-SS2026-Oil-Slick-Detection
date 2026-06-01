@@ -1,6 +1,6 @@
 ## TODO
 
-- [?] really ensure all imagery data is downloaded / available on HF somewhen
+- [x] really ensure all imagery data is downloaded / available on HF somewhen
 - [x] ensure that all data are useful / find non-useful data via thresholding
 - [x] load VV and VH as a tensor properly, normalized via zscore/overall normalization in TRAINING PIPELINE
 - [x] do mean-std-normalization/zscore in EDA notebook
@@ -8,12 +8,14 @@
 
 ---
 
-- [ ] calculate train set means/stds for both splits (random and geographic), fix the use of these (either random or geographic) in the training/dataloader pipeline depending on the split for training
+- [x] calculate train set means/stds for both splits (random and geographic)
+- [ ] (soon) fix the use of these values (either random or geographic) in the training/dataloader pipeline depending on the split for training
+- [ ] somewhere, we need to inject information about the filtered data splits (which images are not used for train/val/test anymore?)
 - [ ] add first initial training script
 - [ ] think about regularization techniques
   - [ ] early stopping
   - [ ] L2 reg using adam or adamW
-  - [x] data augmentation
+  - [x] data augmentation (soon there)
   - [x] dropout layers in classification head
 - [ ] after initial train setup, include logging via mlflow during training, validation and testing; after this, we can train properly for both splits
 - [ ] fine-tune (Ayush says "from scratch"?) resnet50 (changed input dims to 2; and a proper head for binary classification)
