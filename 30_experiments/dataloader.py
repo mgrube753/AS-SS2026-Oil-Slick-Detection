@@ -22,18 +22,30 @@ class SARzScore:
         return torch.from_numpy(x_np)
 
 
-# Need different transforms for train (with augmentation) and val/test (without augmentation)
-def get_transform():
-    return transforms.Compose(
-        [SARzScore(), transforms.Resize((224, 224), antialias=True)]
-    )
+# Training transform (with augmentation)
+def get_train_transform():
+    return transforms.Compose([
+        SARzScore(),
+        transforms.RandomHorizontalFlip(p=0.5),
+        transforms.RandomVerticalFlip(p=0.5),
+        transforms.Resize((224, 224), antialias=True),
+    ])
+
+
+# Validation/Test transform (no augmentation)
+def get_val_transform():
+    return transforms.Compose([
+        SARzScore(),
+        transforms.Resize((224, 224), antialias=True),
+    ])
 
 
 def get_train_val_loaders(data_root, batch_size=16):
-    transform = get_transform()
+    train_transform = get_train_transform()
+    val_transform = get_val_transform()
 
-    train_ds = OilSlickDataset(data_root, split="train", transform=transform)
-    val_ds = OilSlickDataset(data_root, split="val", transform=transform)
+    train_ds = OilSlickDataset(data_root,split="train", transform=train_transform)
+    val_ds = OilSlickDataset(data_root, split="val", transform=val_transform)
 
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=False)
@@ -42,9 +54,9 @@ def get_train_val_loaders(data_root, batch_size=16):
 
 
 def get_test_loader(data_root, batch_size=16):
-    transform = get_transform()
+    test_transform = get_val_transform()
 
-    test_ds = OilSlickDataset(data_root, split="test", transform=transform)
+    test_ds = OilSlickDataset(data_root, split="test", transform=test_transform)
     test_loader = DataLoader(test_ds, batch_size=batch_size, shuffle=False)
 
     return test_loader, test_ds
