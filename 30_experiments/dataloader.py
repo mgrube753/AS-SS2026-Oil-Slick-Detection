@@ -81,8 +81,12 @@ def get_train_val_loaders(data_root, batch_size=16, split_type="random"):
     train_transform = get_train_transform(split_type=split_type)
     val_transform = get_val_test_transform(split_type=split_type)
 
-    train_ds = OilSlickDataset(data_root, split="train", transform=train_transform)
-    val_ds = OilSlickDataset(data_root, split="val", transform=val_transform)
+    train_ds = OilSlickDataset(
+        data_root, split_type=split_type, split="train", transform=train_transform
+    )
+    val_ds = OilSlickDataset(
+        data_root, split_type=split_type, split="val", transform=val_transform
+    )
 
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=False)
@@ -93,7 +97,9 @@ def get_train_val_loaders(data_root, batch_size=16, split_type="random"):
 def get_test_loader(data_root, batch_size=16, split_type="random"):
     test_transform = get_val_test_transform(split_type=split_type)
 
-    test_ds = OilSlickDataset(data_root, split="test", transform=test_transform)
+    test_ds = OilSlickDataset(
+        data_root, split_type=split_type, split="test", transform=test_transform
+    )
     test_loader = DataLoader(test_ds, batch_size=batch_size, shuffle=False)
 
     return test_loader, test_ds
