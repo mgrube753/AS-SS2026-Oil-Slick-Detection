@@ -15,7 +15,10 @@ class OilSlickDataset(Dataset):
     def __init__(self, data_root, split_type="random", split="train", transform=None):
         self.image_dir = os.path.join(data_root, "images_s1")
 
-        df = pd.read_csv(os.path.join(data_root, "metadata.csv"))
+        exp_dir = os.path.dirname(os.path.abspath(__file__))
+        df = pd.read_csv(os.path.join(exp_dir, "filtered_metadata.csv"))
+        df = df[df["valid_sample"] == True]
+
         self.labels = dict(zip(df["sample_id"], df["label"]))
 
         with open(
@@ -26,7 +29,8 @@ class OilSlickDataset(Dataset):
         self.image_ids = [
             i
             for i in all_ids
-            if os.path.exists(os.path.join(self.image_dir, f"{i}_s1.tif"))
+            if i in self.labels
+            and os.path.exists(os.path.join(self.image_dir, f"{i}_s1.tif"))
         ]
         self.transform = transform
 
@@ -48,5 +52,19 @@ class OilSlickDataset(Dataset):
 
         if self.transform:
             img_tensor = self.transform(img_tensor)
+
+        # temporary visualization to check if the data looks correct
+        # todo add image names to the plot title
+        shown_once = False
+        if not shown_once:
+            import matplotlib.pyplot as plt
+
+            fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+            axes[0].imshow(img_tensor[0].numpy(), cmap="gray")
+            axes[0].set_title(f"VV - Label: {label}")
+            axes[1].imshow(img_tensor[1].numpy(), cmap="gray")
+            axes[1].set_title(f"VH - Label: {label}")
+            plt.show()
+            shown_once = True
 
         return img_tensor, torch.tensor(label, dtype=torch.long)

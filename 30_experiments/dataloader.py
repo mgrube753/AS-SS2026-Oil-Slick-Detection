@@ -1,5 +1,7 @@
 import torch
 import numpy as np
+import json
+import os
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from dataset import OilSlickDataset
@@ -9,27 +11,10 @@ Creates dataloaders for training, validation and testing.
 Also includes a custom transform for z-scoring the SAR data.
 """
 
-TRAIN_STATS_RANDOM = {
-    "mean_vv": -17.87,
-    "std_vv": 26.34,
-    "mean_vh": -25.61,
-    "std_vh": 19.91,
-}
-
-TRAIN_STATS_GEO = {
-    "mean_vv": -19.42,
-    "std_vv": 22.68,
-    "mean_vh": -26.84,
-    "std_vh": 17.84,
-}
-
 
 class SARzScore:
-    def __init__(self, split_type="random"):
-        self.split_type = split_type
-        self.train_stats = (
-            TRAIN_STATS_RANDOM if split_type == "random" else TRAIN_STATS_GEO
-        )
+    def __init__(self, train_stats):
+        self.train_stats = train_stats
 
     def __call__(self, x):
         x_np = x.numpy()
@@ -55,10 +40,10 @@ class SARzScore:
         return torch.from_numpy(x_np)
 
 
-def get_train_transform(split_type="random"):
+def get_train_transform(train_stats):
     return transforms.Compose(
         [
-            SARzScore(split_type=split_type),
+            SARzScore(train_stats=train_stats),
             transforms.RandomHorizontalFlip(p=0.5),
             transforms.RandomVerticalFlip(p=0.5),
             transforms.RandomRotation(20),
@@ -68,18 +53,28 @@ def get_train_transform(split_type="random"):
     )
 
 
-def get_val_test_transform(split_type="random"):
+def get_val_test_transform(train_stats):
     return transforms.Compose(
         [
-            SARzScore(split_type=split_type),
+            SARzScore(train_stats=train_stats),
             transforms.Resize((224, 224), antialias=True),
         ]
     )
 
 
+def load_split_stats(split_type):
+    exp_dir = os.path.dirname(os.path.abspath(__file__))
+    stats_path = os.path.join(exp_dir, "split_stats.json")
+    with open(stats_path, "r") as f:
+        stats = json.load(f)
+    return stats[split_type]["train"]
+
+
 def get_train_val_loaders(data_root, batch_size=16, split_type="random"):
-    train_transform = get_train_transform(split_type=split_type)
-    val_transform = get_val_test_transform(split_type=split_type)
+    train_stats = load_split_stats(split_type)
+
+    train_transform = get_train_transform(train_stats)
+    val_transform = get_val_test_transform(train_stats)
 
     train_ds = OilSlickDataset(
         data_root, split_type=split_type, split="train", transform=train_transform
@@ -95,7 +90,8 @@ def get_train_val_loaders(data_root, batch_size=16, split_type="random"):
 
 
 def get_test_loader(data_root, batch_size=16, split_type="random"):
-    test_transform = get_val_test_transform(split_type=split_type)
+    train_stats = load_split_stats(split_type)
+    test_transform = get_val_test_transform(train_stats)
 
     test_ds = OilSlickDataset(
         data_root, split_type=split_type, split="test", transform=test_transform
