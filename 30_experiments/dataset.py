@@ -54,17 +54,15 @@ class OilSlickDataset(Dataset):
             img_tensor = self.transform(img_tensor)
 
         # temporary visualization to check if the data looks correct
-        # todo add image names to the plot title
-        shown_once = False
-        if not shown_once:
-            import matplotlib.pyplot as plt
+        import matplotlib.pyplot as plt
 
-            fig, axes = plt.subplots(1, 2, figsize=(10, 5))
-            axes[0].imshow(img_tensor[0].numpy(), cmap="gray")
-            axes[0].set_title(f"VV - Label: {label}")
-            axes[1].imshow(img_tensor[1].numpy(), cmap="gray")
-            axes[1].set_title(f"VH - Label: {label}")
-            plt.show()
-            shown_once = True
+        fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+        fig.suptitle(f"Image: {img_id}_s1.tif", fontsize=14)
+        axes[0].imshow(img_tensor[0].numpy(), cmap="gray")
+        axes[0].set_title(f"VV - Label: {label}")
+        axes[1].imshow(img_tensor[1].numpy(), cmap="gray")
+        axes[1].set_title(f"VH - Label: {label}")
+        plt.tight_layout()
+        plt.show()
 
         return img_tensor, torch.tensor(label, dtype=torch.long)

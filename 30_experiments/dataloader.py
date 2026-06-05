@@ -18,12 +18,10 @@ class SARzScore:
 
     def __call__(self, x):
         x_np = x.numpy()
-        channel_keys = [("mean_vv", "std_vv"), ("mean_vh", "std_vh")]
-
         for c in range(x_np.shape[0]):
-            mean_key, std_key = channel_keys[c]
-            mean = self.train_stats[mean_key]
-            std = self.train_stats[std_key]
+            c_str = str(c)
+            mean = self.train_stats["means"][c_str]
+            std = self.train_stats["stds"][c_str]
 
             nodata = (x_np[c] <= -50) | np.isnan(x_np[c])
             valid = ~nodata
@@ -67,7 +65,7 @@ def load_split_stats(split_type):
     stats_path = os.path.join(exp_dir, "split_stats.json")
     with open(stats_path, "r") as f:
         stats = json.load(f)
-    return stats[split_type]["train"]
+    return stats[split_type]
 
 
 def get_train_val_loaders(data_root, batch_size=16, split_type="random"):
