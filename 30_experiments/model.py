@@ -5,22 +5,16 @@ from terratorch.registry import BACKBONE_REGISTRY
 
 """
 Defines the two model classes for oil slick detection: 
-- ResNet50Classifier: CNN baseline with modified input and output layers.
-- TerraMindClassifier: Uses the TerraMind backbone with a custom classification head.
+- ResNet50Classifier: CNN baseline (pre-trained, unfrozen) with modified input and output layers.
+- TerraMindClassifier: Uses the pre-trained TerraMind backbone (frozen) with a custom classification head.
 """
 
 
 class ResNet50Classifier(nn.Module):
-    def __init__(
-        self, num_classes=2, in_channels=2, pretrained=True, freeze_backbone=True
-    ):
+    def __init__(self, num_classes=2, in_channels=2, pretrained=True):
         super().__init__()
         weights = ResNet50_Weights.IMAGENET1K_V2 if pretrained else None
         self.backbone = resnet50(weights=weights)
-
-        if freeze_backbone:
-            for param in self.backbone.parameters():
-                param.requires_grad = False
 
         orig_conv = self.backbone.conv1
         self.backbone.conv1 = nn.Conv2d(
@@ -34,13 +28,14 @@ class ResNet50Classifier(nn.Module):
 
         if pretrained:
             with torch.no_grad():
-                self.backbone.conv1.weight[:, :in_channels] = orig_conv.weight[
-                    :, :in_channels
-                ]
+                mean = orig_conv.weight.mean(dim=1, keepdim=True)
+                self.backbone.conv1.weight[:, 0:1, :, :] = mean
+                self.backbone.conv1.weight[:, 1:2, :, :] = mean
+
+        num_features = self.backbone.fc.in_features
 
         self.backbone.fc = nn.Sequential(
-            nn.Dropout(p=0.5),
-            nn.Linear(self.backbone.fc.in_features, 512),
+            nn.Linear(num_features, 512),
             nn.ReLU(),
             nn.Dropout(p=0.3),
             nn.Linear(512, num_classes),
@@ -54,16 +49,19 @@ class TerraMindClassifier(nn.Module):
     def __init__(self, num_classes=2, freeze_backbone=True):
         super().__init__()
         self.backbone = BACKBONE_REGISTRY.build(
-            "terramind_v1_small", pretrained=True, modalities=["S1GRD"]
+            "terramind_v1_small_tim",
+            pretrained=True,
+            modalities=["S1GRD"],  # todo: ask for RTC?
         )
 
         if freeze_backbone:
             for param in self.backbone.parameters():
                 param.requires_grad = False
 
+        embedding_dim = self.backbone.out_channels[-1]
+
         self.head = nn.Sequential(
-            nn.Dropout(p=0.5),
-            nn.LazyLinear(512),
+            nn.Linear(embedding_dim, 512),
             nn.ReLU(),
             nn.Dropout(p=0.3),
             nn.Linear(512, num_classes),
@@ -75,9 +73,9 @@ class TerraMindClassifier(nn.Module):
         if isinstance(feats, (dict, list, tuple)):
             feats = list(feats.values())[-1] if isinstance(feats, dict) else feats[-1]
 
-        if feats.dim() == 4:
-            feats = feats.mean(dim=[2, 3])
-        elif feats.dim() == 3:
-            feats = feats.mean(dim=1)
+        if feats.dim() == 3:
+            feats = torch.mean(feats, dim=1)
+        elif feats.dim() == 4:
+            feats = torch.mean(feats, dim=[2, 3])
 
         return self.head(feats)

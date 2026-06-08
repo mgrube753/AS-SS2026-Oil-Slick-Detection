@@ -41,12 +41,14 @@ class SARzScore:
 def get_train_transform(train_stats):
     return transforms.Compose(
         [
+            transforms.Resize(
+                (224, 224), interpolation=transforms.InterpolationMode.NEAREST
+            ),
             SARzScore(train_stats=train_stats),
             transforms.RandomHorizontalFlip(p=0.5),
             transforms.RandomVerticalFlip(p=0.5),
             transforms.RandomRotation(20),
-            transforms.RandomApply([transforms.GaussianBlur(3)], p=0.5),
-            transforms.Resize((224, 224), antialias=True),
+            # transforms.RandomApply([transforms.GaussianBlur(3)], p=0.5),
         ]
     )
 
@@ -54,8 +56,10 @@ def get_train_transform(train_stats):
 def get_val_test_transform(train_stats):
     return transforms.Compose(
         [
+            transforms.Resize(
+                (224, 224), interpolation=transforms.InterpolationMode.NEAREST
+            ),
             SARzScore(train_stats=train_stats),
-            transforms.Resize((224, 224), antialias=True),
         ]
     )
 
@@ -81,8 +85,12 @@ def get_train_val_loaders(data_root, batch_size=16, split_type="random"):
         data_root, split_type=split_type, split="val", transform=val_transform
     )
 
-    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True)
-    val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=False)
+    train_loader = DataLoader(
+        train_ds, batch_size=batch_size, shuffle=True, num_workers=8, pin_memory=True
+    )
+    val_loader = DataLoader(
+        val_ds, batch_size=batch_size, shuffle=False, num_workers=8, pin_memory=True
+    )
 
     return train_loader, val_loader, train_ds
 
@@ -94,6 +102,8 @@ def get_test_loader(data_root, batch_size=16, split_type="random"):
     test_ds = OilSlickDataset(
         data_root, split_type=split_type, split="test", transform=test_transform
     )
-    test_loader = DataLoader(test_ds, batch_size=batch_size, shuffle=False)
+    test_loader = DataLoader(
+        test_ds, batch_size=batch_size, shuffle=False, num_workers=8, pin_memory=True
+    )
 
     return test_loader, test_ds

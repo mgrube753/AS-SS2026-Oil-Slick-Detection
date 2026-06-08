@@ -1,5 +1,5 @@
 import torch
-from dataloader import get_test_loader
+from dataloader import get_train_val_loaders, get_test_loader
 from model import ResNet50Classifier, TerraMindClassifier
 
 """
@@ -14,7 +14,23 @@ def evaluate(model_name="resnet50", batch_size=16):
 
     data_root = "../10_waterbench_data/data/OilSlick"
 
-    loader, ds = get_test_loader(data_root, batch_size)
+    loader, _, ds = get_train_val_loaders(
+        data_root, batch_size=batch_size, split_type="random"
+    )
+    # _, loader, ds = get_train_val_loaders(
+    #     data_root, batch_size=batch_size, split_type="random"
+    # )
+    # loader, ds = get_test_loader(data_root, batch_size=batch_size, split_type="random")
+
+    # loader, _, ds = get_train_val_loaders(
+    #     data_root, batch_size=batch_size, split_type="geographic"
+    # )
+    # _, loader, ds = get_train_val_loaders(
+    #     data_root, batch_size=batch_size, split_type="geographic"
+    # )
+    # loader, ds = get_test_loader(
+    #     data_root, batch_size=batch_size, split_type="geographic"
+    # )
 
     if model_name == "resnet50":
         model = ResNet50Classifier(num_classes=2, in_channels=2)

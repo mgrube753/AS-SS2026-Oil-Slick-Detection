@@ -13,10 +13,7 @@
 ├── failure_analysis.py        [Confusion matrices, lookalike analysis (also MLflow possible?)]
 ├── (utils.py)                 [Helper functions if needed]
 │
-├── run_random_cnn.py          [Runner for Random Split + ResNet50] # 4 runner scripts needed?
-├── run_random_gfm.py          [Runner for Random Split + TerraMind]
-├── run_geographic_cnn.py      [Runner for Geographic Split + ResNet50]
-├── run_geographic_gfm.py      [Runner for Geographic Split + TerraMind]
+├── runner.py                  [Argparse-based script for all 4 experimental runs]
 │
 ├── random_split/
 │   ├── .gitkeep
