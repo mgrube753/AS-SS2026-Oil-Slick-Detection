@@ -53,7 +53,7 @@ def evaluate(model_name="resnet50", batch_size=16):
             if imgs.shape[1] > 2:
                 imgs = imgs[:, :2, :, :]
             outputs = model(imgs)
-            preds = (outputs.flatten() > 0.5).int()
+            preds = (torch.sigmoid(outputs).flatten() > 0.5).int()
 
             correct += (preds == labels).sum().item()
             total += labels.size(0)

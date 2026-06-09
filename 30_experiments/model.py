@@ -40,7 +40,6 @@ class ResNet50Classifier(nn.Module):
             nn.ReLU(),
             nn.Dropout(p=0.3),
             nn.Linear(512, num_classes - 1),
-            nn.Sigmoid(),
         )
 
     def forward(self, x):
@@ -48,7 +47,7 @@ class ResNet50Classifier(nn.Module):
 
 
 class TerraMindClassifier(nn.Module):
-    def __init__(self, num_classes=2, freeze_backbone=True):
+    def __init__(self, num_classes=2, freeze_backbone=False):
         super().__init__()
         self.backbone = BACKBONE_REGISTRY.build(
             "terramind_v1_small",
@@ -67,7 +66,6 @@ class TerraMindClassifier(nn.Module):
             nn.ReLU(),
             nn.Dropout(p=0.3),
             nn.Linear(512, num_classes - 1),
-            nn.Sigmoid(),
         )
 
     def forward(self, x):

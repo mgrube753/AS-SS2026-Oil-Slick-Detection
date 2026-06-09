@@ -65,7 +65,7 @@ def train_epoch(model, loader, optimizer, criterion, device):
         optimizer.step()
 
         loss_acc += loss.item()
-        all_probs.append(outputs.detach())
+        all_probs.append(torch.sigmoid(outputs).detach())
         all_labels.append(labels)
 
     epoch_loss = loss_acc / len(loader)
@@ -88,7 +88,7 @@ def validate_epoch(model, loader, criterion, device):
             loss = criterion(outputs, labels.float().unsqueeze(1))
 
             loss_acc += loss.item()
-            all_probs.append(outputs)
+            all_probs.append(torch.sigmoid(outputs))
             all_labels.append(labels)
 
     epoch_loss = loss_acc / len(loader)
@@ -135,10 +135,14 @@ def run_training(model_name, split_type):
     # useful: warmup phase for both models to do essential changes to heads' weights, then switch to cosine annealing to step-wise reduce LR
     scheduler = CosineAnnealingLR(optimizer, T_max=Config.EPOCHS)
 
-    # weights = torch.tensor(Config.CLASS_WEIGHTS, dtype=torch.float).to(Config.DEVICE)
-    criterion = (
-        nn.BCELoss()
-    )  # todo: think about class weighting based on positive/negative ratio in training set
+    # pos_weight = torch.tensor(Config.CLASS_WEIGHTS[1], dtype=torch.float).to(
+    # Config.DEVICE
+    # )
+    # criterion = nn.BCEWithLogitsLoss(
+    #     pos_weight=pos_weight
+    # )
+    criterion = nn.BCEWithLogitsLoss()
+    # todo: think about class weighting based on positive/negative ratio in training set instead of fixed values
     criterion.to(Config.DEVICE)
 
     for epoch in range(Config.EPOCHS):

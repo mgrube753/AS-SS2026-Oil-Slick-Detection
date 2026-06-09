@@ -11,7 +11,7 @@ class Config:
     DATA_ROOT = "../10_waterbench_data/data/OilSlick"
     OUTPUT_ROOT = "."
 
-    BATCH_SIZE = 32
+    BATCH_SIZE = 16
     EPOCHS = 16  # todo: check if this is enough for convergence
     EARLY_STOPPING_PATIENCE = 4  # todo: implement soon
     DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
