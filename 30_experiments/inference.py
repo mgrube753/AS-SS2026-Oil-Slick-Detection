@@ -52,8 +52,9 @@ def evaluate(model_name="resnet50", batch_size=16):
 
             if imgs.shape[1] > 2:
                 imgs = imgs[:, :2, :, :]
+            outputs = model(imgs)
+            preds = (outputs.flatten() > 0.5).int()
 
-            preds = torch.argmax(model(imgs), dim=1)
             correct += (preds == labels).sum().item()
             total += labels.size(0)
 
@@ -76,4 +77,4 @@ def evaluate(model_name="resnet50", batch_size=16):
 
 
 if __name__ == "__main__":
-    evaluate("terramind")
+    evaluate()

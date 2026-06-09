@@ -8,6 +8,7 @@
 
 ---
 
+- [ ] instead of resnet50, small cnn baseline --> we might have to change filtering based on CNN results/failure cases
 - [x] calculate train set means/stds for both splits (random and geographic)
 - [x] fix the use of these values (either random or geographic) in the training/dataloader pipeline depending on the split for training
 - [x] somewhere, we need to inject information about the filtered data splits (which images are not used for train/val/test anymore?)

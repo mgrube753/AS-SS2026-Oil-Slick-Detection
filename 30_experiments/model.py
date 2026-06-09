@@ -11,6 +11,7 @@ Defines the two model classes for oil slick detection:
 
 
 class ResNet50Classifier(nn.Module):
+    # todo: use small baseline only instead of resnet50, from SCRATCH (input layer 2-channeled, conv1 16 channels, conv2 32 channels, 32 or 64 neurons hidden layer, 1 output neuron + sigmoid as below)
     def __init__(self, num_classes=2, in_channels=2, pretrained=True):
         super().__init__()
         weights = ResNet50_Weights.IMAGENET1K_V2 if pretrained else None
@@ -38,7 +39,8 @@ class ResNet50Classifier(nn.Module):
             nn.Linear(num_features, 512),
             nn.ReLU(),
             nn.Dropout(p=0.3),
-            nn.Linear(512, num_classes),
+            nn.Linear(512, num_classes - 1),
+            nn.Sigmoid(),
         )
 
     def forward(self, x):
@@ -49,9 +51,9 @@ class TerraMindClassifier(nn.Module):
     def __init__(self, num_classes=2, freeze_backbone=True):
         super().__init__()
         self.backbone = BACKBONE_REGISTRY.build(
-            "terramind_v1_small_tim",
+            "terramind_v1_small",
             pretrained=True,
-            modalities=["S1GRD"],  # todo: ask for RTC?
+            modalities=["S1GRD"],
         )
 
         if freeze_backbone:
@@ -64,7 +66,8 @@ class TerraMindClassifier(nn.Module):
             nn.Linear(embedding_dim, 512),
             nn.ReLU(),
             nn.Dropout(p=0.3),
-            nn.Linear(512, num_classes),
+            nn.Linear(512, num_classes - 1),
+            nn.Sigmoid(),
         )
 
     def forward(self, x):

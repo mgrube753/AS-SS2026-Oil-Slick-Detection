@@ -42,13 +42,13 @@ def get_train_transform(train_stats):
     return transforms.Compose(
         [
             transforms.Resize(
-                (224, 224), interpolation=transforms.InterpolationMode.NEAREST
+                (224, 224),
+                antialias=True,
             ),
             SARzScore(train_stats=train_stats),
             transforms.RandomHorizontalFlip(p=0.5),
             transforms.RandomVerticalFlip(p=0.5),
-            transforms.RandomRotation(20),
-            # transforms.RandomApply([transforms.GaussianBlur(3)], p=0.5),
+            # transforms.RandomRotation(20),
         ]
     )
 
@@ -56,9 +56,7 @@ def get_train_transform(train_stats):
 def get_val_test_transform(train_stats):
     return transforms.Compose(
         [
-            transforms.Resize(
-                (224, 224), interpolation=transforms.InterpolationMode.NEAREST
-            ),
+            transforms.Resize((224, 224), antialias=True),
             SARzScore(train_stats=train_stats),
         ]
     )

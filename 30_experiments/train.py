@@ -32,7 +32,10 @@ This pipeline has to be revised properly, since currently
 
 
 def calc_metrics(probs, labels):
-    preds = np.argmax(probs, axis=1)
+    probs = probs.flatten()
+    preds = (probs > 0.5).astype(int)
+    auc_probs = probs
+
     metrics = {
         "accuracy": accuracy_score(labels, preds),
         "precision": precision_score(labels, preds, zero_division=0),
@@ -40,7 +43,7 @@ def calc_metrics(probs, labels):
         "f1": f1_score(labels, preds, zero_division=0),
     }
     try:
-        metrics["auc_roc"] = roc_auc_score(labels, probs[:, 1])
+        metrics["auc_roc"] = roc_auc_score(labels, auc_probs)
     except ValueError:
         metrics["auc_roc"] = 0.5
     return metrics
@@ -57,12 +60,12 @@ def train_epoch(model, loader, optimizer, criterion, device):
 
         optimizer.zero_grad()
         outputs = model(images)
-        loss = criterion(outputs, labels)
+        loss = criterion(outputs, labels.float().unsqueeze(1))
         loss.backward()
         optimizer.step()
 
         loss_acc += loss.item()
-        all_probs.append(torch.softmax(outputs, dim=1).detach())
+        all_probs.append(outputs.detach())
         all_labels.append(labels)
 
     epoch_loss = loss_acc / len(loader)
@@ -82,10 +85,10 @@ def validate_epoch(model, loader, criterion, device):
         for images, labels in tqdm(loader, desc="Validation", leave=False):
             images, labels = images.to(device), labels.to(device)
             outputs = model(images)
-            loss = criterion(outputs, labels)
+            loss = criterion(outputs, labels.float().unsqueeze(1))
 
             loss_acc += loss.item()
-            all_probs.append(torch.softmax(outputs, dim=1))
+            all_probs.append(outputs)
             all_labels.append(labels)
 
     epoch_loss = loss_acc / len(loader)
@@ -132,8 +135,10 @@ def run_training(model_name, split_type):
     # useful: warmup phase for both models to do essential changes to heads' weights, then switch to cosine annealing to step-wise reduce LR
     scheduler = CosineAnnealingLR(optimizer, T_max=Config.EPOCHS)
 
-    weights = torch.tensor(Config.CLASS_WEIGHTS, dtype=torch.float).to(Config.DEVICE)
-    criterion = nn.CrossEntropyLoss(weight=weights)
+    # weights = torch.tensor(Config.CLASS_WEIGHTS, dtype=torch.float).to(Config.DEVICE)
+    criterion = (
+        nn.BCELoss()
+    )  # todo: think about class weighting based on positive/negative ratio in training set
     criterion.to(Config.DEVICE)
 
     for epoch in range(Config.EPOCHS):
