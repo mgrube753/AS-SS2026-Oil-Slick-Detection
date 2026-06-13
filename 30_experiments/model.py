@@ -1,49 +1,51 @@
 import torch
 import torch.nn as nn
-from torchvision.models import resnet50, ResNet50_Weights
-from terratorch.registry import BACKBONE_REGISTRY
+from terratorch.registry import BACKBONE_REGISTRY 
 
 """
 Defines the two model classes for oil slick detection: 
-- ResNet50Classifier: CNN baseline (pre-trained, unfrozen) with modified input and output layers.
+- BaselineCNN: Small CNN trained from scratch.
 - TerraMindClassifier: Uses the pre-trained TerraMind backbone (frozen) with a custom classification head.
 """
 
 
-class ResNet50Classifier(nn.Module):
-    # todo: use small baseline only instead of resnet50, from SCRATCH (input layer 2-channeled, conv1 16 channels, conv2 32 channels, 32 or 64 neurons hidden layer, 1 output neuron + sigmoid as below)
-    def __init__(self, num_classes=2, in_channels=2, pretrained=True):
+class BaselineCNN(nn.Module):
+    def __init__(self, num_classes=2, in_channels=2):
         super().__init__()
-        weights = ResNet50_Weights.IMAGENET1K_V2 if pretrained else None
-        self.backbone = resnet50(weights=weights)
 
-        orig_conv = self.backbone.conv1
-        self.backbone.conv1 = nn.Conv2d(
-            in_channels,
-            orig_conv.out_channels,
-            kernel_size=orig_conv.kernel_size,
-            stride=orig_conv.stride,
-            padding=orig_conv.padding,
-            bias=False,
+        self.features = nn.Sequential(
+            nn.Conv2d(
+                in_channels=in_channels,
+                out_channels=16,
+                kernel_size=3,
+                padding=1
+            ),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+
+            nn.Conv2d(
+                in_channels=16,
+                out_channels=32,
+                kernel_size=3,
+                padding=1
+            ),
+            nn.ReLU(),
+            nn.MaxPool2d(2)
         )
 
-        if pretrained:
-            with torch.no_grad():
-                mean = orig_conv.weight.mean(dim=1, keepdim=True)
-                self.backbone.conv1.weight[:, 0:1, :, :] = mean
-                self.backbone.conv1.weight[:, 1:2, :, :] = mean
-
-        num_features = self.backbone.fc.in_features
-
-        self.backbone.fc = nn.Sequential(
-            nn.Linear(num_features, 512),
+        self.classifier = nn.Sequential(
+            nn.AdaptiveAvgPool2d((1, 1)),
+            nn.Flatten(),
+            nn.Linear(32, 64),
             nn.ReLU(),
-            nn.Dropout(p=0.3),
-            nn.Linear(512, num_classes - 1),
+            nn.Linear(64, 1)
+            
         )
 
     def forward(self, x):
-        return self.backbone(x)
+        x = self.features(x)
+        x = self.classifier(x)
+        return x
 
 
 class TerraMindClassifier(nn.Module):
@@ -80,3 +82,4 @@ class TerraMindClassifier(nn.Module):
             feats = torch.mean(feats, dim=[2, 3])
 
         return self.head(feats)
+

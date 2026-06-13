@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
+import random
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from tqdm import tqdm
 from sklearn.metrics import (
@@ -13,7 +14,7 @@ from sklearn.metrics import (
 )
 
 from dataloader import get_train_val_loaders
-from model import ResNet50Classifier, TerraMindClassifier
+from model import BaselineCNN,TerraMindClassifier
 from config import Config
 
 """
@@ -30,7 +31,17 @@ This pipeline has to be revised properly, since currently
 - no checkpoint saving is implemented
 """
 
+def set_seed(seed=42):
+    random.seed(seed)
+    np.random.seed(seed)
 
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    
 def calc_metrics(probs, labels):
     probs = probs.flatten()
     preds = (probs > 0.5).astype(int)
@@ -99,16 +110,18 @@ def validate_epoch(model, loader, criterion, device):
 
 
 def run_training(model_name, split_type):
+    set_seed(42)
     print(f"Model: {model_name} | Split: {split_type}")
 
     train_loader, val_loader, _ = get_train_val_loaders(
         data_root=Config.DATA_ROOT, batch_size=Config.BATCH_SIZE, split_type=split_type
     )
 
-    if model_name == "resnet50":
-        model = ResNet50Classifier(
-            num_classes=Config.NUM_CLASSES, in_channels=Config.IN_CHANNELS
-        )
+    if model_name == "baselinecnn":
+        model = BaselineCNN(
+        num_classes=Config.NUM_CLASSES,
+        in_channels=Config.IN_CHANNELS
+    )
     elif model_name == "terramind":
         model = TerraMindClassifier(num_classes=Config.NUM_CLASSES)
     else:
@@ -121,12 +134,12 @@ def run_training(model_name, split_type):
         trainable_params,
         lr=(
             Config.LEARNING_RATE_CNN
-            if model_name == "resnet50"
+            if model_name == "baselinecnn"
             else Config.LEARNING_RATE_GFM
         ),
         weight_decay=(
             Config.WEIGHT_DECAY_CNN
-            if model_name == "resnet50"
+            if model_name == "baselinecnn"
             else Config.WEIGHT_DECAY_GFM
         ),
     )
