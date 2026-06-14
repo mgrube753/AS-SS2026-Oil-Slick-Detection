@@ -69,7 +69,7 @@ Version control is maintained through GitHub\footnote{\url{https://github.com/mg
 
 \subsection{Exploratory Description}
 \subsubsection{What descriptive summaries (distributions, correlations, outliers) were made to understand the data before modeling?} The data analysis notebook includes plots showing the distribution of positive and negative labels, subcategory counts, and a world map of sample locations. Histograms on dB value ranges and boxplots for VV and VH channels help visualize SAR backscatter ranges. Summary statistics such as mean, standard deviation, and percentiles were also computed to understand the data before modeling. Moreover, distribution plots for nodata fractions and its filtering process are included, so that statistics can be compared.
-\subsubsection{Is an Exploratory Data Analysis (EDA) available? If so, where?} The mentioned EDA notebook is available in the GitHub repository\footnote{\url{https://github.com/mgrube753/AS-SS2026-Oil-Slick-Detection/tree/main/20_data_analysis}, accessed 13/05/2026}.
+\subsubsection{Is an Exploratory Data Analysis (EDA) available? If so, where?} The mentioned EDA notebook is available on GitHub\footnote{\url{https://github.com/mgrube753/AS-SS2026-Oil-Slick-Detection/tree/main/20_data_analysis}, accessed 13/05/2026}.
 
 \subsection{Splitting (anti-leakage)}
 \subsubsection{How were the training, validation, and test splits defined (randomly, by time, by region, by group)?} Two splits are defined: (1) a random split for in-distribution data, and (2) a geographic split with the Mediterranean as an out-of-distribution set.
@@ -90,13 +90,13 @@ Version control is maintained through GitHub\footnote{\url{https://github.com/mg
 \subsection{Training Protocol}
 \subsubsection{What objective function(s) and weighting schemes were used?} The binary cross-entropy with logits loss was used, since the classification heads end with a single-neuron sigmoid. Additionally, class weighting is crucial since the dataset is imbalanced. % todo: class weighting has to be done properly then
 \subsubsection{How were hyperparameters tuned (grid, random, Bayesian, CV design)?} Grid search is applied to find the best hyperparameter configuration for both models in our project.
-\subsubsection{What measures were taken to stop the model from overfitting (e.g., regularization penalties, early stopping during training)?} A dropout layer for each modified classification head, and early stopping based on the validation loss with a patience of 4 epochs. L2 regularization is also applied by using AdamW as the optimizer of choice. Furthermore, to create more training data, data augmentation is applied by using random horizontal and vertical flipping. \textcolor{red}{Moreover, random rotation by 90-degree steps is also considered soon.}
+\subsubsection{What measures were taken to stop the model from overfitting (e.g., regularization penalties, early stopping during training)?} A dropout layer for each modified classification head, and early stopping based on the validation loss with a patience of 4 epochs. L2 regularization is also applied by using AdamW as the optimizer of choice. Furthermore, to create more training data, data augmentation is applied by using random horizontal and vertical flipping. Moreover, random rotation by 90-degree steps is also considered.
 
 \subsection{Evaluation \& Baselines}
 \subsubsection{What key results have been obtained?}
 \subsubsection{Which metrics were chosen (primary and secondary), and why?} Accuracy, precision, recall, F1 score, and AUROC are used for evaluating the binary classification performance robustly across both split types.
 \subsubsection{How do validation / test results support claims?}
-\subsubsection{What steps were taken to check overfitting / underfitting?} To detect overfitting / underfitting, training and validation loss curves \textcolor{red}{will be} logged during training to check for any divergence (overfitting) or convergence (with high loss: underfitting). The mentioned early stopping procedure is implemented to stop training when validation loss does not improve.
+\subsubsection{What steps were taken to check overfitting / underfitting?} To detect overfitting / underfitting, e.g.\,training and validation loss curves are plotted and logged using mlflow during training to check for any divergence (overfitting) or convergence (with high loss: underfitting). The mentioned early stopping procedure is implemented to stop training when validation loss does not improve.
 
 \subsubsection{How was uncertainty quantified or assessed (data, parameters, algorithms, scenarios)?} By using the two given data splits (random and geographic), we can assess the models' generalization performance and robustness to these different distributions. Additionally, by using two different models (CNN baseline and GFM), we can compare their performance, regarding the GFM's potential benefits from pre-training on geospatial data.
 
