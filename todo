@@ -1,5 +1,15 @@
 ## TODO
 
+- move filtered_metadata.csv and split_stats.json to 20_data_analysis/ and read them from there in the training pipeline
+- add class weighting based on the imbalance (positive vs. negative) in the training set for both splits
+- setup proper he kaiming init for baseline model instead of default pytorch init
+- for both models: use warmup phase and cosine annealing for learning rate scheduling
+- add early stopping for training (monitoring validation loss)
+- we need to do grid search for finding the best hyperparameters for both models (using learning rate, weight decay)
+- add mlflow for logging of training, validation and test metrics; also log hyperparameters for each run (saved in \*split/cnn/logs/ and \*split/gfm/logs/)
+- add saving of model checkpoints during training (best val loss) and after training (final model) for each config (saved in \*split/cnn/models/ and \*split/gfm/models/)
+- the \*split/*/results/ are used for eval.py, failure_analysis.py (confusion matrices, lookalike analysis) and Grad-CAM for CNN
+
 - [x] really ensure all imagery data is downloaded / available on HF somewhen
 - [?] ensure that all data are useful / find non-useful data via thresholding (still need to identify more invalid samples and reasons for that)
 - [x] load VV and VH as a tensor properly, normalized via zscore/overall normalization in TRAINING PIPELINE

@@ -17,7 +17,7 @@
 │
 ├── random_split/
 │   ├── .gitkeep
-│   ├── cnn/                   [ResNet50 Outputs]
+│   ├── cnn/                   [Baseline Outputs]
 │   │   ├── models/            [Model checkpoints]
 │   │   ├── logs/              [MLflow Outputs]
 │   │   └── results/           [Metrics, eval outputs]
@@ -28,7 +28,7 @@
 │
 └── geographic_split/
     ├── .gitkeep
-    ├── cnn/                   [ResNet50 Outputs]
+    ├── cnn/                   [Baseline Outputs]
     │   ├── models/
     │   ├── logs/
     │   └── results/
