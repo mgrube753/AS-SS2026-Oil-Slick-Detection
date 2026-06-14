@@ -14,7 +14,7 @@ from sklearn.metrics import (
 )
 
 from dataloader import get_train_val_loaders
-from model import BaselineCNN,TerraMindClassifier
+from model import BaselineCNN, TerraMindClassifier
 from config import Config
 
 """
@@ -25,11 +25,11 @@ and a first learning rate scheduler.
 This pipeline has to be revised properly, since currently
 - no stable training for both models is achieved by testing out
   LR schedulers might be the improvement!
-- no seeding is included
 - no early stopping is implemented
 - no mlflow logging is implemented
 - no checkpoint saving is implemented
 """
+
 
 def set_seed(seed=42):
     random.seed(seed)
@@ -41,7 +41,8 @@ def set_seed(seed=42):
 
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
-    
+
+
 def calc_metrics(probs, labels):
     probs = probs.flatten()
     preds = (probs > 0.5).astype(int)
@@ -110,18 +111,20 @@ def validate_epoch(model, loader, criterion, device):
 
 
 def run_training(model_name, split_type):
-    set_seed(42)
+    set_seed(Config.SEED)
     print(f"Model: {model_name} | Split: {split_type}")
 
     train_loader, val_loader, _ = get_train_val_loaders(
-        data_root=Config.DATA_ROOT, batch_size=Config.BATCH_SIZE, split_type=split_type
+        data_root=Config.DATA_ROOT,
+        batch_size=Config.BATCH_SIZE,
+        split_type=split_type,
+        seed=Config.SEED,
     )
 
     if model_name == "baselinecnn":
         model = BaselineCNN(
-        num_classes=Config.NUM_CLASSES,
-        in_channels=Config.IN_CHANNELS
-    )
+            num_classes=Config.NUM_CLASSES, in_channels=Config.IN_CHANNELS
+        )
     elif model_name == "terramind":
         model = TerraMindClassifier(num_classes=Config.NUM_CLASSES)
     else:
@@ -173,3 +176,4 @@ def run_training(model_name, split_type):
         )
 
         scheduler.step()
+

@@ -10,8 +10,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument(
     "--model-name",
     type=str,
-    choices=["resnet50", "terramind"],
-    default="resnet50",
+    choices=["baselinecnn", "terramind"],
+    default="baselinecnn",
     help="Name of the model to train",
 )
 parser.add_argument(
@@ -26,3 +26,4 @@ args = parser.parse_args()
 
 if __name__ == "__main__":
     run_training(model_name=args.model_name, split_type=args.split_type)
+

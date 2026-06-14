@@ -1,6 +1,6 @@
 import torch
 from dataloader import get_train_val_loaders, get_test_loader
-from model import ResNet50Classifier, TerraMindClassifier
+from model import BaselineCNN, TerraMindClassifier
 
 """
 Temporal file for running some inference to
@@ -8,7 +8,7 @@ check the modules' functionality.
 """
 
 
-def evaluate(model_name="resnet50", batch_size=16):
+def evaluate(model_name="baselinecnn", batch_size=16):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Device: {device}")
 
@@ -32,8 +32,8 @@ def evaluate(model_name="resnet50", batch_size=16):
     #     data_root, batch_size=batch_size, split_type="geographic"
     # )
 
-    if model_name == "resnet50":
-        model = ResNet50Classifier(num_classes=2, in_channels=2)
+    if model_name == "baselinecnn":
+        model = BaselineCNN(num_classes=2, in_channels=2)
     elif model_name == "terramind":
         model = TerraMindClassifier(num_classes=2)
     else:
@@ -78,3 +78,4 @@ def evaluate(model_name="resnet50", batch_size=16):
 
 if __name__ == "__main__":
     evaluate()
+

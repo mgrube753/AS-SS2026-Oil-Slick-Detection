@@ -4,6 +4,7 @@ import json
 import os
 from torch.utils.data import DataLoader
 from torchvision import transforms
+import torchvision.transforms.functional as TF
 from dataset import OilSlickDataset
 
 """
@@ -48,7 +49,12 @@ def get_train_transform(train_stats):
             SARzScore(train_stats=train_stats),
             transforms.RandomHorizontalFlip(p=0.5),
             transforms.RandomVerticalFlip(p=0.5),
-            # transforms.RandomRotation(20),
+            transforms.RandomChoice(
+                [
+                    transforms.Lambda(lambda x: torch.rot90(x, k, [-1, -2]))
+                    for k in range(4)
+                ]
+            ),
         ]
     )
 
@@ -70,7 +76,10 @@ def load_split_stats(split_type):
     return stats[split_type]
 
 
-def get_train_val_loaders(data_root, batch_size=16, split_type="random"):
+def get_train_val_loaders(data_root, batch_size=16, split_type="random", seed=42):
+    g = torch.Generator()
+    g.manual_seed(seed)
+
     train_stats = load_split_stats(split_type)
 
     train_transform = get_train_transform(train_stats)
@@ -84,16 +93,29 @@ def get_train_val_loaders(data_root, batch_size=16, split_type="random"):
     )
 
     train_loader = DataLoader(
-        train_ds, batch_size=batch_size, shuffle=True, num_workers=8, pin_memory=True
+        train_ds,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=8,
+        pin_memory=True,
+        generator=g,
     )
     val_loader = DataLoader(
-        val_ds, batch_size=batch_size, shuffle=False, num_workers=8, pin_memory=True
+        val_ds,
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=8,
+        pin_memory=True,
+        generator=g,
     )
 
     return train_loader, val_loader, train_ds
 
 
-def get_test_loader(data_root, batch_size=16, split_type="random"):
+def get_test_loader(data_root, batch_size=16, split_type="random", seed=42):
+    g = torch.Generator()
+    g.manual_seed(seed)
+
     train_stats = load_split_stats(split_type)
     test_transform = get_val_test_transform(train_stats)
 
@@ -101,7 +123,12 @@ def get_test_loader(data_root, batch_size=16, split_type="random"):
         data_root, split_type=split_type, split="test", transform=test_transform
     )
     test_loader = DataLoader(
-        test_ds, batch_size=batch_size, shuffle=False, num_workers=8, pin_memory=True
+        test_ds,
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=8,
+        pin_memory=True,
+        generator=g,
     )
 
     return test_loader, test_ds

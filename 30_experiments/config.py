@@ -11,6 +11,7 @@ class Config:
     DATA_ROOT = "../10_waterbench_data/data/OilSlick"
     OUTPUT_ROOT = "."
 
+    SEED = 42
     BATCH_SIZE = 16
     EPOCHS = 16  # todo: check if this is enough for convergence
     EARLY_STOPPING_PATIENCE = 4  # todo: implement soon

@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from terratorch.registry import BACKBONE_REGISTRY 
+from terratorch.registry import BACKBONE_REGISTRY
 
 """
 Defines the two model classes for oil slick detection: 
@@ -15,22 +15,13 @@ class BaselineCNN(nn.Module):
 
         self.features = nn.Sequential(
             nn.Conv2d(
-                in_channels=in_channels,
-                out_channels=16,
-                kernel_size=3,
-                padding=1
+                in_channels=in_channels, out_channels=16, kernel_size=3, padding=1
             ),
             nn.ReLU(),
             nn.MaxPool2d(2),
-
-            nn.Conv2d(
-                in_channels=16,
-                out_channels=32,
-                kernel_size=3,
-                padding=1
-            ),
+            nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, padding=1),
             nn.ReLU(),
-            nn.MaxPool2d(2)
+            nn.MaxPool2d(2),
         )
 
         self.classifier = nn.Sequential(
@@ -38,8 +29,8 @@ class BaselineCNN(nn.Module):
             nn.Flatten(),
             nn.Linear(32, 64),
             nn.ReLU(),
-            nn.Linear(64, 1)
-            
+            nn.Dropout(p=0.3),
+            nn.Linear(64, num_classes - 1),
         )
 
     def forward(self, x):
@@ -82,4 +73,5 @@ class TerraMindClassifier(nn.Module):
             feats = torch.mean(feats, dim=[2, 3])
 
         return self.head(feats)
+
 
