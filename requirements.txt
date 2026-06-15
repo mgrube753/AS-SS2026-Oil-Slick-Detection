@@ -11,3 +11,5 @@ torchvision
 terratorch
 tifffile
 folium
+mlflow
+imagecodecs
