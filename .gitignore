@@ -1,4 +1,4 @@
-# Python related
+# Python / experiment related
 .python-version
 .pyc
 .pycache/
@@ -9,8 +9,11 @@ __pycache__/
 !10_waterbench_data/.gitkeep
 filtered_metadata.csv
 split_stats.json
-geographic_spit/
-random_split/
+30_experiments/logs/**/*
+!30_experiments/logs/**/
+!30_experiments/logs/**/.gitkeep
+
+.trash/
 
 # Latex related
 *.aux

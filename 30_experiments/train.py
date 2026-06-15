@@ -46,29 +46,17 @@ def run_training(model_name, split_type, lr=None, wd=None):
 
     model.to(Config.DEVICE)
 
-    if model_name == "baselinecnn":
-        model_folder = "cnn"
-    else:
-        model_folder = "gfm"
+    model_folder = "cnn" if model_name == "baselinecnn" else "gfm"
+    split_folder = "random_split" if split_type == "random" else "geographic_split"
 
-    if split_type == "random":
-        split_folder = "random_split"
-    else:
-        split_folder = "geographic_split"
+    exp_base_dir = os.path.join(Config.OUTPUT_ROOT, "logs", split_folder, model_folder)
+    mlflow_path = os.path.abspath(os.path.join(Config.OUTPUT_ROOT, "logs", "mlflow"))
 
-    mlflow_path = os.path.abspath(os.path.join(split_folder, model_folder, "logs"))
     os.makedirs(mlflow_path, exist_ok=True)
     mlflow.set_tracking_uri(f"file://{mlflow_path}")
     mlflow.set_experiment(f"{model_name}-{split_type}")
 
-    checkpoint_dir = os.path.join(
-        Config.OUTPUT_ROOT,
-        split_folder,
-        model_folder,
-        "models",
-        f"lr{lr}_wd{wd}",
-    )
-
+    checkpoint_dir = os.path.join(exp_base_dir, "models", f"lr{lr}_wd{wd}")
     os.makedirs(checkpoint_dir, exist_ok=True)
     best_model_path = os.path.join(checkpoint_dir, "best_model.pth")
     final_model_path = os.path.join(checkpoint_dir, "final_model.pth")
