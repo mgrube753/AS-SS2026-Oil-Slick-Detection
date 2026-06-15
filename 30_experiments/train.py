@@ -4,7 +4,7 @@ import torch.optim as optim
 import numpy as np
 import os
 import random
-from torch.optim.lr_scheduler import CosineAnnealingLR
+from torch.optim.lr_scheduler import CosineAnnealingLR, LinearLR, SequentialLR
 from tqdm import tqdm
 from sklearn.metrics import (
     accuracy_score,
@@ -23,12 +23,7 @@ Model- and split-specific training script including
 training and validation loops, metric calculations,
 and a first learning rate scheduler.
 
-This pipeline has to be revised properly, since currently
-- no stable training for both models is achieved by testing out
-  LR schedulers might be the improvement!
-- no early stopping is implemented
 - no mlflow logging is implemented
-- no checkpoint saving is implemented
 """
 
 
@@ -111,9 +106,16 @@ def validate_epoch(model, loader, criterion, device):
     return epoch_loss, metrics
 
 
-def run_training(model_name, split_type):
+def run_training(model_name, split_type, lr=None, wd=None):
     set_seed(Config.SEED)
-    print(f"Model: {model_name} | Split: {split_type}")
+    epochs = Config.EPOCHS_CNN if model_name == "baselinecnn" else Config.EPOCHS_GFM
+    warmup = (
+        Config.WARMUP_EPOCHS_CNN
+        if model_name == "baselinecnn"
+        else Config.WARMUP_EPOCHS_GFM
+    )
+
+    print(f"Config for Model: {model_name} | Split: {split_type} | LR: {lr} | WD: {wd}")
 
     train_loader, val_loader, _ = get_train_val_loaders(
         data_root=Config.DATA_ROOT,
@@ -123,21 +125,19 @@ def run_training(model_name, split_type):
     )
 
     if model_name == "baselinecnn":
-        model = BaselineCNN(
-            num_classes=Config.NUM_CLASSES, in_channels=Config.IN_CHANNELS
-        )
+        model = BaselineCNN(num_classes=2, in_channels=2)
     elif model_name == "terramind":
-        model = TerraMindClassifier(num_classes=Config.NUM_CLASSES)
+        model = TerraMindClassifier(num_classes=2)
     else:
         raise ValueError(f"Unknown model: {model_name}")
 
     model.to(Config.DEVICE)
-    
+
     if model_name == "baselinecnn":
         model_folder = "cnn"
     else:
         model_folder = "gfm"
-    
+
     if split_type == "random":
         split_folder = "random_split"
     else:
@@ -146,38 +146,21 @@ def run_training(model_name, split_type):
         Config.OUTPUT_ROOT,
         split_folder,
         model_folder,
+        f"lr{lr}_wd{wd}",
         "models",
     )
 
     os.makedirs(checkpoint_dir, exist_ok=True)
-    best_model_path = os.path.join(
-        checkpoint_dir,
-        "best_model.pth"
-    )
+    best_model_path = os.path.join(checkpoint_dir, "best_model.pth")
 
-    final_model_path = os.path.join(
-        checkpoint_dir,
-        "final_model.pth"
-    )
+    final_model_path = os.path.join(checkpoint_dir, "final_model.pth")
 
     trainable_params = [p for p in model.parameters() if p.requires_grad]
-    optimizer = optim.AdamW(
-        trainable_params,
-        lr=(
-            Config.LEARNING_RATE_CNN
-            if model_name == "baselinecnn"
-            else Config.LEARNING_RATE_GFM
-        ),
-        weight_decay=(
-            Config.WEIGHT_DECAY_CNN
-            if model_name == "baselinecnn"
-            else Config.WEIGHT_DECAY_GFM
-        ),
-    )
+    optimizer = optim.AdamW(trainable_params, lr=lr, weight_decay=wd)
 
-    # todo: need to set up proper scheduler and LR/WD values
-    # useful: warmup phase for both models to do essential changes to heads' weights, then switch to cosine annealing to step-wise reduce LR
-    scheduler = CosineAnnealingLR(optimizer, T_max=Config.EPOCHS)
+    s1 = LinearLR(optimizer, start_factor=0.1, total_iters=warmup)
+    s2 = CosineAnnealingLR(optimizer, T_max=epochs - warmup, eta_min=lr * 0.01)
+    scheduler = SequentialLR(optimizer, schedulers=[s1, s2], milestones=[warmup])
 
     # pos_weight = torch.tensor(Config.CLASS_WEIGHTS[1], dtype=torch.float).to(
     # Config.DEVICE
@@ -188,26 +171,28 @@ def run_training(model_name, split_type):
     criterion = nn.BCEWithLogitsLoss()
     # todo: think about class weighting based on positive/negative ratio in training set instead of fixed values
     criterion.to(Config.DEVICE)
-    
+
     best_val_loss = float("inf")
     patience_counter = 0
 
-    for epoch in range(Config.EPOCHS):
+    for epoch in range(epochs):
         train_loss, _ = train_epoch(
             model, train_loader, optimizer, criterion, Config.DEVICE
         )
         val_loss, v_m = validate_epoch(model, val_loader, criterion, Config.DEVICE)
 
         print(
-            f"Epoch {epoch+1}/{Config.EPOCHS} | LR: {optimizer.param_groups[0]['lr']:.6f} | "
+            f"Epoch {epoch+1}/{epochs} | LR: {optimizer.param_groups[0]['lr']:.6f} | "
             f"Train Loss: {train_loss:.4f} | Val Loss: {val_loss:.4f}"
         )
         print(
             f"Validation | Acc: {v_m['accuracy']:.4f}, F1: {v_m['f1']:.4f}, AUC: {v_m['auc_roc']:.4f}"
         )
+
         if val_loss < best_val_loss:
             best_val_loss = val_loss
             patience_counter = 0
+
             torch.save(
                 {
                     "epoch": epoch + 1,
@@ -219,16 +204,20 @@ def run_training(model_name, split_type):
             )
 
             print(f"Best model saved (Val Loss = {val_loss:.4f})")
-        
-        else:
+
+        elif epoch >= warmup:
             patience_counter += 1
 
-            print(f"No improvement for {patience_counter}/{Config.EARLY_STOPPING_PATIENCE} epochs" )
+            print(
+                f"No improvement for {patience_counter}/{Config.EARLY_STOPPING_PATIENCE} epochs"
+            )
 
             if patience_counter >= Config.EARLY_STOPPING_PATIENCE:
-                print("Early stopping triggered.")
+                print("Early stopping.")
                 break
+
         scheduler.step()
+
     torch.save(
         {
             "epoch": epoch + 1,

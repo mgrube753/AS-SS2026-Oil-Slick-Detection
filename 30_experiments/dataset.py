@@ -16,7 +16,9 @@ class OilSlickDataset(Dataset):
         self.image_dir = os.path.join(data_root, "images_s1")
 
         exp_dir = os.path.dirname(os.path.abspath(__file__))
-        df = pd.read_csv(os.path.join(exp_dir, "filtered_metadata.csv"))
+        df = pd.read_csv(
+            os.path.join(exp_dir, "..", "20_data_analysis", "filtered_metadata.csv")
+        )
         df = df[df["valid_sample"] == True]
 
         self.labels = dict(zip(df["sample_id"], df["label"]))
@@ -55,7 +57,7 @@ class OilSlickDataset(Dataset):
 
         # temporary visualization to check if the data looks correct
         # RUN THIS by using inference.py
-        # todo BEFORE UNCOMMENTING: set num_workers=1 in dataloader.py
+        # todo BEFORE UNCOMMENTING: set num_workers=0 in dataloader.py
         # import matplotlib.pyplot as plt
 
         # fig, axes = plt.subplots(1, 2, figsize=(10, 5))

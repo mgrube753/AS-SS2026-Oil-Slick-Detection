@@ -1,9 +1,12 @@
 from train import run_training
 import argparse
+from config import Config
 
 """
 Argparse-based runner script to execute training
 with different models and split types (4 combinations).
+These combinations are used for grid search over
+learning rates and weight decays.
 """
 
 parser = argparse.ArgumentParser()
@@ -25,5 +28,20 @@ parser.add_argument(
 args = parser.parse_args()
 
 if __name__ == "__main__":
-    run_training(model_name=args.model_name, split_type=args.split_type)
+    lrs = (
+        Config.LEARNING_RATES_CNN
+        if args.model_name == "baselinecnn"
+        else Config.LEARNING_RATES_GFM
+    )
+    wds = (
+        Config.WEIGHT_DECAYS_CNN
+        if args.model_name == "baselinecnn"
+        else Config.WEIGHT_DECAYS_GFM
+    )
 
+    print(f"Grid Search for {args.model_name}...")
+    for lr in lrs:
+        for wd in wds:
+            run_training(
+                model_name=args.model_name, split_type=args.split_type, lr=lr, wd=wd
+            )

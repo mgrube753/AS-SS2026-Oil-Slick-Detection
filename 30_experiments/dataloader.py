@@ -4,13 +4,28 @@ import json
 import os
 from torch.utils.data import DataLoader
 from torchvision import transforms
-import torchvision.transforms.functional as TF
 from dataset import OilSlickDataset
 
 """
 Creates dataloaders for training, validation and testing.
 Also includes a custom transform for z-scoring the SAR data.
 """
+
+
+def rotate0(x):
+    return torch.rot90(x, 0, [-1, -2])
+
+
+def rotate90(x):
+    return torch.rot90(x, 1, [-1, -2])
+
+
+def rotate180(x):
+    return torch.rot90(x, 2, [-1, -2])
+
+
+def rotate270(x):
+    return torch.rot90(x, 3, [-1, -2])
 
 
 class SARzScore:
@@ -51,8 +66,10 @@ def get_train_transform(train_stats):
             transforms.RandomVerticalFlip(p=0.5),
             transforms.RandomChoice(
                 [
-                    transforms.Lambda(lambda x: torch.rot90(x, k, [-1, -2]))
-                    for k in range(4)
+                    transforms.Lambda(rotate0),
+                    transforms.Lambda(rotate90),
+                    transforms.Lambda(rotate180),
+                    transforms.Lambda(rotate270),
                 ]
             ),
         ]
@@ -70,7 +87,7 @@ def get_val_test_transform(train_stats):
 
 def load_split_stats(split_type):
     exp_dir = os.path.dirname(os.path.abspath(__file__))
-    stats_path = os.path.join(exp_dir, "split_stats.json")
+    stats_path = os.path.join(exp_dir, "..", "20_data_analysis", "split_stats.json")
     with open(stats_path, "r") as f:
         stats = json.load(f)
     return stats[split_type]

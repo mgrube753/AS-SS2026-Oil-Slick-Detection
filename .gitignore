@@ -9,6 +9,8 @@ __pycache__/
 !10_waterbench_data/.gitkeep
 filtered_metadata.csv
 split_stats.json
+geographic_spit/
+random_split/
 
 # Latex related
 *.aux

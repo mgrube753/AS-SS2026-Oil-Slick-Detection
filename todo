@@ -1,13 +1,13 @@
 ## TODO
 
-- move filtered_metadata.csv and split_stats.json to 20_data_analysis/ and read them from there in the training pipeline
-- add class weighting based on the imbalance (positive vs. negative) in the training set for both splits
-- setup proper he kaiming init for baseline model instead of default pytorch init
-- for both models: use warmup phase and cosine annealing for learning rate scheduling
-- add early stopping for training (monitoring validation loss)
-- we need to do grid search for finding the best hyperparameters for both models (using learning rate, weight decay)
-- add mlflow for logging of training, validation and test metrics; also log hyperparameters for each run (saved in \*split/cnn/logs/ and \*split/gfm/logs/)
-- add saving of model checkpoints during training (best val loss) and after training (final model) for each config (saved in \*split/cnn/models/ and \*split/gfm/models/)
+- [ ] add class weighting based on the imbalance (positive vs. negative) in the training set for both splits
+- [ ] add mlflow for logging of training, validation and test metrics; also log hyperparameters for each run (saved in \*split/cnn/logs/ and \*split/gfm/logs/)
+- [x] move filtered_metadata.csv and split_stats.json to 20_data_analysis/ and read them from there in the training pipeline
+- [x] setup proper he kaiming init for baseline model instead of default pytorch init
+- [x] for both models: use warmup phase and cosine annealing for learning rate scheduling
+- [x] add early stopping for training (monitoring validation loss)
+- [x] we need to do grid search for finding the best hyperparameters for both models (using learning rate, weight decay)
+- [x] add saving of model checkpoints during training (best val loss) and after training (final model) for each config (saved in \*split/cnn/models/ and \*split/gfm/models/)
 - the \*split/*/results/ are used for eval.py, failure_analysis.py (confusion matrices, lookalike analysis) and Grad-CAM for CNN
 
 - [x] really ensure all imagery data is downloaded / available on HF somewhen
@@ -24,7 +24,7 @@
 - [x] somewhere, we need to inject information about the filtered data splits (which images are not used for train/val/test anymore?)
 - [x] add first initial training script
 - [ ] think about regularization techniques
-  - [ ] early stopping
+  - [x] early stopping
   - [x] L2 reg using adam or adamW
   - [x] data augmentation
   - [x] dropout layer in classification head
