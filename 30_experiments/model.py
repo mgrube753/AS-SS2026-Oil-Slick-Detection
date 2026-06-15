@@ -1,12 +1,29 @@
 import torch
 import torch.nn as nn
-from terratorch.registry import BACKBONE_REGISTRY
+try:
+    from terratorch.registry import BACKBONE_REGISTRY
+except ImportError:
+    BACKBONE_REGISTRY = None
+
 
 """
 Defines the two model classes for oil slick detection: 
 - BaselineCNN: Small CNN trained from scratch.
 - TerraMindClassifier: Uses the pre-trained TerraMind backbone (frozen) with a custom classification head.
 """
+
+def init_kaiming_weights(m):
+    if isinstance(m, nn.Conv2d):
+        nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
+
+        if m.bias is not None:
+            nn.init.constant_(m.bias, 0)
+
+    elif isinstance(m, nn.Linear):
+        nn.init.kaiming_normal_(m.weight, nonlinearity="relu")
+
+        if m.bias is not None:
+            nn.init.constant_(m.bias, 0)
 
 
 class BaselineCNN(nn.Module):
@@ -32,6 +49,8 @@ class BaselineCNN(nn.Module):
             nn.Dropout(p=0.3),
             nn.Linear(64, num_classes - 1),
         )
+        self.apply(init_kaiming_weights)
+        
 
     def forward(self, x):
         x = self.features(x)
@@ -42,6 +61,10 @@ class BaselineCNN(nn.Module):
 class TerraMindClassifier(nn.Module):
     def __init__(self, num_classes=2, freeze_backbone=False):
         super().__init__()
+        if BACKBONE_REGISTRY is None:
+            raise ImportError(
+                "TerraTorch is not installed. Cannot use TerraMindClassifier."
+            )
         self.backbone = BACKBONE_REGISTRY.build(
             "terramind_v1_small",
             pretrained=True,

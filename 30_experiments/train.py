@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
+import os
 import random
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from tqdm import tqdm
@@ -131,6 +132,33 @@ def run_training(model_name, split_type):
         raise ValueError(f"Unknown model: {model_name}")
 
     model.to(Config.DEVICE)
+    
+    if model_name == "baselinecnn":
+        model_folder = "cnn"
+    else:
+        model_folder = "gfm"
+    
+    if split_type == "random":
+        split_folder = "random_split"
+    else:
+        split_folder = "geographic_split"
+    checkpoint_dir = os.path.join(
+        Config.OUTPUT_ROOT,
+        split_folder,
+        model_folder,
+        "models",
+    )
+
+    os.makedirs(checkpoint_dir, exist_ok=True)
+    best_model_path = os.path.join(
+        checkpoint_dir,
+        "best_model.pth"
+    )
+
+    final_model_path = os.path.join(
+        checkpoint_dir,
+        "final_model.pth"
+    )
 
     trainable_params = [p for p in model.parameters() if p.requires_grad]
     optimizer = optim.AdamW(
@@ -160,6 +188,9 @@ def run_training(model_name, split_type):
     criterion = nn.BCEWithLogitsLoss()
     # todo: think about class weighting based on positive/negative ratio in training set instead of fixed values
     criterion.to(Config.DEVICE)
+    
+    best_val_loss = float("inf")
+    patience_counter = 0
 
     for epoch in range(Config.EPOCHS):
         train_loss, _ = train_epoch(
@@ -174,6 +205,38 @@ def run_training(model_name, split_type):
         print(
             f"Validation | Acc: {v_m['accuracy']:.4f}, F1: {v_m['f1']:.4f}, AUC: {v_m['auc_roc']:.4f}"
         )
+        if val_loss < best_val_loss:
+            best_val_loss = val_loss
+            patience_counter = 0
+            torch.save(
+                {
+                    "epoch": epoch + 1,
+                    "model_state_dict": model.state_dict(),
+                    "optimizer_state_dict": optimizer.state_dict(),
+                    "val_loss": val_loss,
+                },
+                best_model_path,
+            )
 
+            print(f"Best model saved (Val Loss = {val_loss:.4f})")
+        
+        else:
+            patience_counter += 1
+
+            print(f"No improvement for {patience_counter}/{Config.EARLY_STOPPING_PATIENCE} epochs" )
+
+            if patience_counter >= Config.EARLY_STOPPING_PATIENCE:
+                print("Early stopping triggered.")
+                break
         scheduler.step()
+    torch.save(
+        {
+            "epoch": epoch + 1,
+            "model_state_dict": model.state_dict(),
+            "optimizer_state_dict": optimizer.state_dict(),
+            "val_loss": val_loss,
+        },
+        final_model_path,
+    )
 
+    print(f"Final model saved to {final_model_path}")
