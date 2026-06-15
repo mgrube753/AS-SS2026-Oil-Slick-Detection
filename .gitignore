@@ -12,6 +12,7 @@ split_stats.json
 30_experiments/logs/**/*
 !30_experiments/logs/**/
 !30_experiments/logs/**/.gitkeep
+50_evaluation/*
 
 .trash/
 
