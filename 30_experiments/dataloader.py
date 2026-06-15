@@ -113,16 +113,16 @@ def get_train_val_loaders(data_root, batch_size=16, split_type="random", seed=42
         train_ds,
         batch_size=batch_size,
         shuffle=True,
-        num_workers=0,
-        pin_memory=True,
+        num_workers=8,
+        # pin_memory=True,
         generator=g,
     )
     val_loader = DataLoader(
         val_ds,
         batch_size=batch_size,
         shuffle=False,
-        num_workers=0,
-        pin_memory=True,
+        num_workers=8,
+        # pin_memory=True,
         generator=g,
     )
 
@@ -143,8 +143,8 @@ def get_test_loader(data_root, batch_size=16, split_type="random", seed=42):
         test_ds,
         batch_size=batch_size,
         shuffle=False,
-        num_workers=0,
-        pin_memory=True,
+        num_workers=8,
+        # pin_memory=True,
         generator=g,
     )
 

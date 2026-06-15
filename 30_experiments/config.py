@@ -25,8 +25,3 @@ class Config:
     LEARNING_RATES_GFM = [5e-4, 1e-3, 3e-3]  # > CNN
     WEIGHT_DECAYS_GFM = [1e-5, 1e-4, 1e-3]  # < CNN
     #########
-    POS_WEIGHT = ...  # has to be set as #neg / #pos for train phase samples
-    CLASS_WEIGHTS = [
-        1.0,
-        2.0,
-    ]  # remove this then

@@ -1,7 +1,7 @@
 ## TODO
 
-- [ ] add class weighting based on the imbalance (positive vs. negative) in the training set for both splits
-- [ ] add mlflow for logging of training, validation and test metrics; also log hyperparameters for each run (saved in \*split/cnn/logs/ and \*split/gfm/logs/)
+- [x] add class weighting based on the imbalance (positive vs. negative) in the training set for both splits
+- [x] add mlflow for logging of training, validation and test metrics; also log hyperparameters for each run (saved in \*split/cnn/logs/ and \*split/gfm/logs/)
 - [x] move filtered_metadata.csv and split_stats.json to 20_data_analysis/ and read them from there in the training pipeline
 - [x] setup proper he kaiming init for baseline model instead of default pytorch init
 - [x] for both models: use warmup phase and cosine annealing for learning rate scheduling
