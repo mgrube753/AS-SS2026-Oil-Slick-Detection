@@ -1,0 +1,241 @@
+%% 
+%% This is file `unirostock.sty'
+%% 
+%% by Mathias Winkel
+%%
+%% Problems, bugs and comments to 
+%% mathias.winkel2@uni-rostock.de
+%%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{unirostock}[2009/09/23 v. 2.0 LaTeX-Package fuer A0-Poster nach dem CD der Uni-Rostock]
+
+\RequirePackage{multicol}
+\RequirePackage{color}
+\RequirePackage{graphicx}
+\RequirePackage{suffix}
+\RequirePackage{tikz}
+\RequirePackage{ifpdf}
+
+
+%%%%%%%% Farboptionen fuer die einzelnen Bereiche %%%%%%%%
+\DeclareOption{uni}{\definecolor{colorscheme}{cmyk}{1.00, 0.75, 0.00, 0.00}}
+\DeclareOption{inf}{\definecolor{colorscheme}{cmyk}{0.40, 0.00, 1.00, 0.00}}
+\DeclareOption{msf}{\definecolor{colorscheme}{cmyk}{1.00, 0.30, 0.00, 0.00}}
+\DeclareOption{ief}{\definecolor{colorscheme}{cmyk}{0.90, 0.30, 0.00, 0.00}}
+\DeclareOption{mnf}{\definecolor{colorscheme}{cmyk}{0.00, 1.00, 1.00, 0.40}}
+\DeclareOption{mef}{\definecolor{colorscheme}{cmyk}{0.45, 1.00, 0.50, 0.20}}
+\DeclareOption{juf}{\definecolor{colorscheme}{cmyk}{0.00, 1.00, 0.80, 0.00}}
+\DeclareOption{wsf}{\definecolor{colorscheme}{cmyk}{0.10, 0.00, 0.00, 0.40}}
+\DeclareOption{auf}{\definecolor{colorscheme}{cmyk}{1.00, 0.00, 1.00, 0.50}}
+\DeclareOption{thf}{\definecolor{colorscheme}{cmyk}{0.15, 0.90, 1.00, 0.05}}
+\DeclareOption{phf}{\definecolor{colorscheme}{cmyk}{0.80, 1.00, 0.00, 0.00}}
+
+\ExecuteOptions{uni}
+\ProcessOptions\relax
+
+%%%%%%%% weitere Farben %%%%%%%%%%%%%%
+\definecolor{subtitlegray}{cmyk}{0.00, 0.00, 0.00, 0.50}
+
+%%%%%%%% Separator fuer Fusszeile %%%%
+\def\@sep{\ |\ }
+
+%%%%%%%% Rand- und Groesseneinstellungen %
+% Bug in a0poster.cls ?? - TeX-Papierformat stimmt nicht mit ps-Papierformat in a0b ueberein - bei a0 stimmts jedoch und in pdflatex gehts auch
+\ifpdf\else
+\ifanullb
+  \ifportrait \paperheight=120cm \paperwidth=91.51cm \else \paperwidth=120cm \paperheight=91.51cm \fi
+\else {} \fi
+\fi
+
+% Randeinstellungen etc
+% ...existing code...
+\setlength{\voffset}{16.6mm}
+\setlength{\hoffset}{33.6mm}
+\textwidth=\paperwidth \advance\textwidth by -118mm % links und rechts je 59mm Rand
+\newlength{\minip@gewidth}
+\minip@gewidth=\textwidth \advance\minip@gewidth by -106.5mm
+\textheight=\paperheight \advance\textheight by -39mm   % <--- hier anpassen (höher/kleiner machen)
+\newlength{\f@@tboxtop}    \f@@tboxtop=\paperheight \advance\f@@tboxtop by -305mm  % Fußbereich oben
+\newlength{\f@@tboxbottom} \f@@tboxbottom=\paperheight \advance\f@@tboxbottom by -208mm % Fußbereich unten
+% ...existing code...
+% Breite der unteren Box
+\newlength{\fr@mewidth} \fr@mewidth=\textwidth \advance\fr@mewidth by -4.55pt
+\setlength{\columnsep}{15mm}          % Spaltenabstand in multicols-Umgebung
+\setlength{\columnseprule}{0pt}       % Strichdicke zwischen den Spalten
+% Breite fuer weiteren Logobereich im Header
+\newlength{\l@gowidth} \l@gowidth=\fr@mewidth \advance\l@gowidth by -420mm \advance\l@gowidth by -4.55pt
+
+%%%%%%%% Grundkommandos %%%%%%%%%%%%%%%%%
+% eigenes Logo
+\newcommand{\mylogo}{}
+% Titel und Untertitel des Posters mit \title{xyz}, \subtitle{xyz}
+\def\title#1{\def\p@stertitle{{#1}}}
+\def\subtitle#1{\def\p@stersubtitle{{#1}}}
+% Ueberschrift mit Box, vgl. S.61 im CD-Handbuch
+\newlength\secb@xwidth
+% Test auf gesternte Version von section, um Probleme mit thebiliography zu verhindern
+\def\section#1{\postersection{#1}}
+\WithSuffix\def\section*#1{\postersection{#1}}
+\def\postersection#1{\setlength{\secb@xwidth}{\linewidth}
+               \advance\secb@xwidth by -\columnsep
+               \vspace{28.35pt}\hfil\begin{tikzpicture}
+                                      \color{colorscheme}
+                                      \draw (0, 0) node[color=colorscheme, fill=colorscheme, rounded corners=6.25mm]
+                                            {
+                                            \vspace*{0.3em}
+                                            \begin{minipage}[t][][t]{\secb@xwidth}
+                                              \begin{center}
+                                                 \textcolor{white}{\arialnarrow{45}{60}{#1}}
+                                              \end{center}
+                                            \end{minipage}
+                                            \vspace*{0.3em}
+                                            };
+                                   \end{tikzpicture}
+                              \hfil\nobreak\par}
+
+% Fliesstextueberschrift
+\def\subsection#1{\vspace{28.35pt}\arialnarrow{25}{28.35}{\bf #1}\nobreak\\[28.35pt]}
+
+% Standardspaltenzahl
+\newcount\c@lumncount
+\ifportrait\c@lumncount=2 \else\c@lumncount=4 \fi
+% .. kann mit \columncount{x} geaendert werden
+\def\columncount#1{\c@lumncount=#1}
+
+
+% \addcontributor{Er}{a} zum Hinzufuegen eines Wissenschaftlers zur Fusszeile
+
+\def\addcontributor#1#2{\@ifundefined{c@ntributors}{%
+    \def\c@ntributors{#1\raisebox{12pt}{\arialnarrow{40}{30}{\hspace*{8pt}#2}}}}{%
+    \g@addto@macro\c@ntributors{,\ #1\raisebox{12pt}{\arialnarrow{40}{30}{\hspace*{8pt}#2}}}}}
+
+
+% \addinstitute{a}{Institut}{Lehrstuhl}{Fachbereich}{Universit\"at Rostock}{Musterstra{\ss}e 00}{18055 Rostock}{Germany} dito
+\def\Institutet@ble{}
+\def\addinstitute#1#2#3#4#5#6#7#8{\g@addto@macro\Institutet@ble{%
+\raisebox{12pt}{\arialnarrow{40}{30}{#1\hspace*{8pt}}} &%
+\edef\@temp{#2}\ifx\@temp\@empty{}\else\verd{40}{50}{\MakeUppercase{#2}}\@sep\fi%
+\edef\@temp{#3}\ifx\@temp\@empty{}\else\verd{40}{50}{\MakeUppercase{#3}}\@sep\fi%
+\edef\@temp{#4}\ifx\@temp\@empty{}\else\verd{40}{50}{\MakeUppercase{#4}}\@sep\fi%
+\arialnarrow{40}{50}{\bf #5}%
+\edef\@temp{#6}\ifx\@temp\@empty{}\else,\ \arialnarrow{40}{50}{#6}\fi%
+\edef\@temp{#7}\ifx\@temp\@empty{}\else\@sep\arialnarrow{40}{50}{#7}\fi%
+\edef\@temp{#8}\ifx\@temp\@empty{}\else,\ \arialnarrow{40}{50}{#8}\fi\\[-12pt]%
+
+                                                                }}%
+% erstellt die Institutstabelle in der Fusszeile
+\def\m@kefooter{
+  \begin{center}
+    \parbox{\minip@gewidth}{
+      \vbox to 97mm{
+          \vfil
+          \textcolor{white}{
+          \arialnarrow{45}{60}{\bf \c@ntributors\\[20pt]}
+          \setlength{\parskip}{0pt}         % Abstand nach Absatz
+          \begin{tabular}{ll}
+             \Institutet@ble
+          \end{tabular}
+          }\vfil}}
+  \end{center}
+}
+
+
+
+%%%%%%%% Schriftarten %%%%%%%%%%%%%%%%%
+% \verd{10}{12}{Text} setzt ``Text'' in Verdana, Schriftgroesse 10, Zeilenabstand 12 etc
+\newcommand{\verd}[3]{\fontfamily{pag}\fontseries{m}\fontshape{n}\fontsize{#1}{#2}\selectfont{}#3{} \normalfont}
+\newcommand{\arial}[3]{\fontfamily{phv}\fontseries{m}\fontshape{n}\fontsize{#1}{#2}\selectfont{}#3{}\normalfont}
+\newcommand{\arialnarrow}[3]{\fontfamily{phv}\fontseries{mc}\fontshape{n}\fontsize{#1}{#2}\selectfont{}#3{}\normalfont}
+%
+\newcommand{\titlef@nt}[1]{\textcolor{colorscheme}{\verd{100}{120}{#1}}}
+\newcommand{\subtitlef@nt}[1]{\textcolor{subtitlegray}{\arialnarrow{70}{80}{#1}}}
+
+
+% globale Schriftart
+\renewcommand{\encodingdefault}{T1}
+\renewcommand{\familydefault}{phv}
+\renewcommand{\seriesdefault}{m}
+\renewcommand{\shapedefault}{n}
+\fontsize{40}{48.35}
+% \fontsize{25}{33.35}
+\normalfont
+\selectfont
+
+
+%%%%%%%%
+\AtBeginDocument{
+  % Koordinaten: links 59mm, oben 49mm
+  % Unilogo
+  \setlength{\tabcolsep}{0pt}
+  \begin{tabular}{lr}
+  \includegraphics[width=420mm]{./unirostock/UNI-Logo_Siegel_4c_RZ} &
+    \begin{minipage}[b]{\l@gowidth}
+      \raggedleft \mylogo
+    \end{minipage}
+  \end{tabular}\\
+  %
+  % Rahmen mit abgerundeten Ecken
+    \rule{0pt}{40mm}
+    \begin{tikzpicture}[baseline=40mm]
+       \draw[rounded corners=12.5mm, line width=4.55pt, color=colorscheme, fill=white] (0mm,40mm) rectangle (\textwidth, -\f@@tboxbottom );
+       \draw[rounded corners=00.0mm, line width=4.55pt, color=colorscheme, fill=colorscheme](0mm, -\f@@tboxtop) rectangle (\textwidth, -\f@@tboxbottom );
+    \end{tikzpicture}
+    %
+    % Koordinaten: links 59mm, oben 130mm
+    \vspace*{-\f@@tboxbottom}
+    \vspace*{-10mm}
+    %
+  % Koordinaten: links 59mm, oben 210mm
+  \begin{center}
+  \begin{minipage}[c]{\minip@gewidth}
+  \setlength{\parindent}{0.0mm}         % Absatzeinzug
+  \setlength{\parskip}{8.35pt}         % Abstand nach Absatz
+  \begin{multicols}{\c@lumncount}[%
+  \@ifundefined{p@stertitle}{}{\titlef@nt{\strut\p@stertitle\strut}\\[60pt]}%
+  \@ifundefined{p@stersubtitle}{}{\subtitlef@nt{\strut\p@stersubtitle\strut}\\[42pt]}%
+                                 ]%
+  %
+  \fontsize{32}{38}\selectfont
+}
+
+
+\AtEndDocument{
+  \end{multicols}
+  \end{minipage}
+  \end{center}
+  \vfill
+  \m@kefooter
+}
+
+
+%%%%%%%%%%%%% myfigure %%%%%%%%%%%%%%%%%%%
+% Ersatz fuer figure, das in multicols nicht funktioniert
+\setcounter{figure}{0}
+\def\myfigure#1#2#3#4#5{\myfigureflex{\includegraphics[angle=#1,width=#3\linewidth]{#2}}{#4}{#5}}
+
+%%%%%%%%%%%%% myfigureflex %%%%%%%%%%%%%%%%%%%
+% Flexiblere Variante von myfigure
+\def\myfigureflex#1#2#3{
+\vspace{0.5cm}
+\begin{minipage}{\linewidth}
+\begin{center}
+  #1\\
+  \nobreak\medskip\relax
+  % wenn #5 nicht leer ist: Caption setzen
+  \def\w@testt{#3}\relax
+  \ifx\w@testt\@empty{}\else{
+                          \refstepcounter{figure}
+                          % wenn #2 nicht leer ist: Label setzen
+                          \edef\w@test{#2}\relax
+                          \ifx\w@test\@empty{}\else\label{#2}\fi
+                          \begin{minipage}{1.0\linewidth}
+                            \begin{small}
+                              {\sc \protect\figurename} \arabic{figure}: #3
+                            \end{small}
+                          \end{minipage}
+                          \nobreak\medskip\relax
+                            }
+  \fi
+\end{center}
+\end{minipage}
+}

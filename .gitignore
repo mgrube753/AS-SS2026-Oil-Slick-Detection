@@ -44,3 +44,5 @@ split_stats.json
 
 *.swp
 *.synctex(busy)
+!UNI-Logo_Siegel_4c_RZ.*
+!a0header.ps

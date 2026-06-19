@@ -1,0 +1,71 @@
+\documentclass[a0, portrait, final]{./unirostock/a0poster}
+\usepackage[english]{babel}
+\usepackage{helvet}
+\usepackage{amsmath}
+\usepackage{url}
+\usepackage[normalem]{ulem}
+\usepackage{setspace}
+\usepackage[dvipsnames, table]{xcolor}
+\usepackage[breaklinks=true]{hyperref}
+\usepackage{lipsum}
+    \hypersetup{colorlinks, citecolor=BrickRed, filecolor=Black, linkcolor=Black, urlcolor=MidnightBlue}
+\usepackage[backend=biber,bibencoding=utf8,urldateusetime=true,style=ieee,sorting=none,natbib=true, minbibnames=1, maxbibnames=2]{biblatex}
+\addbibresource{./refs.bib}
+
+\usepackage[uni]{./unirostock/unirostock}
+% uni, inf, msf, ief, mnf, mef, juf, wsf, auf, thf, phf
+
+\usepackage{caption}
+\captionsetup{
+  font=small, 
+  labelfont=bf, 
+  labelsep=period,
+  figurename=Fig.,
+  tablename=Tab.
+}
+
+\title{Oil Slick Detection in Sentinel-1 Data}
+\subtitle{Using a CNN Baseline \& the Geospatial Foundation Model Terramind}
+
+%\columncount{2} % Spaltenzahl im Fliesstext kann eingestellt werden - wird sonst auch automatisch vorbelegt:
+                 % 2 in Hochformat, 4 in Querformat
+
+\addcontributor{Malte Grube}{}
+\addcontributor{Suma Gonuguntla}{}
+\addcontributor{Vishnu Kaivalya Gudapati \& \uline{Ayush Prasad}}{}
+
+\addinstitute{\hspace{-.2em}}{Institute of Computer Science}{}{}{University of Rostock}{A-Einstein-Str. 22}{Rostock}{Germany}
+
+\renewcommand{\mylogo}{\includegraphics[width=140mm]{IFI.png}}
+
+\AtBeginBibliography{\small}
+
+\begin{document} 
+
+% todo: watch this here below for figures
+% how to add figures (should be like this):
+% \myfigure{<column>}{<path>}{<img-scale>}{<label for reference>}{<caption>}
+% \myfigure{0}{./img/image.png}{1.0}{fig:motivation}{}
+
+\nocite{Jakubik_2025_ICCV}
+
+\section{Test 1}
+\subsection{Test 1.1}
+\lipsum[1-3]
+
+\section{Test 2}
+\subsection{Test 2.1}
+\lipsum[4-6]
+
+\section{Test 3}
+\subsection{Test 3.1}
+\lipsum[7-9]
+
+\section{Test 4}
+\subsection{Test 4.1}
+\lipsum[10-12]
+
+\printbibliography
+
+\end{document}
+
