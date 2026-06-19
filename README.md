@@ -55,15 +55,12 @@ The [`20_data_analysis/`](20_data_analysis/) directory contains a Jupyter Notebo
 
     ```bash
     python runner.py --model-name baselinecnn --split-type random
-
     python runner.py --model-name baselinecnn --split-type geographic
-
     python runner.py --model-name terramind --split-type random
-
     python runner.py --model-name terramind --split-type geographic
     ```
 
-    Each of the 4 runs executes grid search over model-specific hyperparameter set combinations. This includes 3 learning rates and 3 weight decays for each model, resulting in 4x3x3=36 model trainings.
+    Each of the 4 runs executes grid search over model-specific hyperparameter set combinations. This includes 3 learning rates and 3 weight decays for each model, resulting in 4x3x3=36 model trainings in total.
 2. While the experiments are running, you can monitor the training progress and loggings using MLflow. Run the respective command in [`30_experiments/`](30_experiments/) to start the MLflow UI:
 
     Linux (and probably MacOS):
@@ -83,8 +80,6 @@ The [`20_data_analysis/`](20_data_analysis/) directory contains a Jupyter Notebo
 For further experimental details, please refer to the [`30_experiments/`](30_experiments/) directory and its [`README.md`](30_experiments/README.md) file. For each Python file, a documentation file is also provided in [`40_documentation/`](40_documentation/) to understand the task, the classes and the functions.
 
 ## Evaluation, Failure Analysis & XAI
-
-(This step is unfinished, needs update soon)
 
 1. After running the experiments and obtaining the best model checkpoints for the 4 experimental configurations, evaluation is crucial. Run [`eval.py`](30_experiments/eval.py) and [`failure_analysis.py`](30_experiments/failure_analysis.py) in [`30_experiments/`](30_experiments/) as follows:
 
@@ -109,4 +104,4 @@ For further experimental details, please refer to the [`30_experiments/`](30_exp
     python gradcam.py --model-name baselinecnn --split-type geographic
     ```
 
-    For the Geo Foundation Model, no XAI method is applied, due to time constraints. For future work, it would be interesting to apply XAI to the GFM as a comparison to the CNN baseline.
+    For the GFM, no XAI method is applied, due to time constraints. For future work, it would be interesting to apply XAI to the GFM as a comparison to the CNN baseline.
