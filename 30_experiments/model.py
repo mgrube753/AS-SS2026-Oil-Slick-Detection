@@ -79,7 +79,7 @@ class TerraMindClassifier(nn.Module):
             nn.Linear(512, num_classes - 1),
         )
 
-        self.apply(init_kaiming_weights)
+        self.head.apply(init_kaiming_weights)
 
     def forward(self, x):
         feats = self.backbone(x)

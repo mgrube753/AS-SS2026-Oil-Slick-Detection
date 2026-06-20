@@ -18,8 +18,13 @@ a loop over epochs for training and validation,
 early stopping, model checkpointing, and MLflow logging.
 """
 
+DARK_GREEN = "\033[32;1m"
+RESET = "\033[0m"
 
-def run_training(model_name, split_type, lr=None, wd=None):
+
+def run_training(
+    model_name, split_type, lr=None, wd=None, total_runs=None, counter=None
+):
     utils.set_seed(Config.SEED)
     epochs = Config.EPOCHS_CNN if model_name == "baselinecnn" else Config.EPOCHS_GFM
     warmup = (
@@ -28,7 +33,9 @@ def run_training(model_name, split_type, lr=None, wd=None):
         else Config.WARMUP_EPOCHS_GFM
     )
 
-    print(f"Config for Model: {model_name} | Split: {split_type} | LR: {lr} | WD: {wd}")
+    print(
+        f"{DARK_GREEN}Config {counter}/{total_runs} for Model: {model_name} | Split: {split_type} | LR: {lr} | WD: {wd}{RESET}"
+    )
 
     train_loader, val_loader, train_ds = get_train_val_loaders(
         data_root=Config.DATA_ROOT,

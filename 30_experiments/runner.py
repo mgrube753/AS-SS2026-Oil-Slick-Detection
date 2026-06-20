@@ -39,9 +39,18 @@ if __name__ == "__main__":
         else Config.WEIGHT_DECAYS_GFM
     )
 
+    total_runs = len(lrs) * len(wds)
+    counter = 0
+
     print(f"Grid Search for {args.model_name}...")
     for lr in lrs:
         for wd in wds:
+            counter += 1
             run_training(
-                model_name=args.model_name, split_type=args.split_type, lr=lr, wd=wd
+                model_name=args.model_name,
+                split_type=args.split_type,
+                lr=lr,
+                wd=wd,
+                total_runs=total_runs,
+                counter=counter,
             )
