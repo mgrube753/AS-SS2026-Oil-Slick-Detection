@@ -58,7 +58,7 @@ class BaselineCNN(nn.Module):
 
 
 class TerraMindClassifier(nn.Module):
-    def __init__(self, num_classes=2, freeze_backbone=False):
+    def __init__(self, num_classes=2, freeze_backbone=True):
         super().__init__()
         self.backbone = BACKBONE_REGISTRY.build(
             "terramind_v1_small",
@@ -73,10 +73,10 @@ class TerraMindClassifier(nn.Module):
         embedding_dim = self.backbone.out_channels[-1]
 
         self.head = nn.Sequential(
-            nn.Linear(embedding_dim, 512),
+            nn.Linear(embedding_dim, 64),
             nn.ReLU(),
             nn.Dropout(p=0.3),
-            nn.Linear(512, num_classes - 1),
+            nn.Linear(64, num_classes - 1),
         )
 
         self.head.apply(init_kaiming_weights)
@@ -89,7 +89,5 @@ class TerraMindClassifier(nn.Module):
 
         if feats.dim() == 3:
             feats = torch.mean(feats, dim=1)
-        elif feats.dim() == 4:
-            feats = torch.mean(feats, dim=[2, 3])
 
         return self.head(feats)
