@@ -5,8 +5,10 @@ set predictions of the individual trained model.
 """
 import os
 import matplotlib.pyplot as plt
-from eval import run_test_inference
-    
+from eval import (
+    run_test_inference,
+    find_best_checkpoint,
+)
 
 def get_failure_indices(all_labels,all_preds):
     fp_indices = []
@@ -51,19 +53,15 @@ def save_examples(indices, dataset, save_dir, prefix):
     print(f"Saved {len(indices)} {prefix} examples to {save_dir}")
         
 
-def run_failure_analysis(split_type,model_type,lr,wd,):
-    print(f"\nRunning Failure Analysis: {split_type} | LR: {lr} | WD: {wd}")
+def run_failure_analysis(split_type,model_type,):
+    
 
     split_folder = "random_split" if split_type == "random" else "geographic_split"
 
-    checkpoint_path = os.path.join(
-        "logs",
-        split_folder,
+    checkpoint_path = find_best_checkpoint(
+        split_type,
         model_type,
-        "models",
-        f"lr{lr}_wd{wd}",
-        "best_model.pth",
-    )
+     )
     results = run_test_inference(checkpoint_path,split_type,model_type,)
     labels = results["labels"]
     preds = results["preds"]
@@ -76,7 +74,6 @@ def run_failure_analysis(split_type,model_type,lr,wd,):
         "50_evaluation",
         split_folder,
         model_type,
-        f"lr{lr}_wd{wd}",
         "results",
         "failure_analysis",
     )
@@ -109,32 +106,24 @@ if __name__ == "__main__":
     run_failure_analysis(
         split_type="geographic",
         model_type="cnn",
-        lr=0.001,
-        wd=0.0001,
     )
 
     # Random CNN
     run_failure_analysis(
         split_type="random",
-        model_type="cnn",
-        lr=0.001,
-        wd=0.0001,
+        model_type="cnn",     
     )
 
     # Geographic GFM
     run_failure_analysis(
         split_type="geographic",
-        model_type="gfm",
-        lr=0.003,
-        wd=0.0001,
+        model_type="gfm",      
     )
 
     # Random GFM
     run_failure_analysis(
         split_type="random",
         model_type="gfm",
-        lr=0.003,
-        wd=0.0001,
     )
 
 

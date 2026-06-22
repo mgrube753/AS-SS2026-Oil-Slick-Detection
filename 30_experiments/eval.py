@@ -19,6 +19,95 @@ from config import Config
 from model import BaselineCNN, TerraMindClassifier
 from dataloader import get_test_loader
 
+def find_best_checkpoint(split_type, model_type):
+
+    mlflow_dir = "mlflow_extracted/mlflow"
+
+    best_checkpoint = None
+    best_val_loss = float("inf")
+
+    model_map = {
+        "cnn": "baselinecnn",
+        "gfm": "terramind",
+    }
+
+    target_model = model_map[model_type]
+
+    for experiment_id in os.listdir(mlflow_dir):
+
+        exp_path = os.path.join(
+            mlflow_dir,
+            experiment_id,
+        )
+
+        if not os.path.isdir(exp_path):
+            continue
+
+        for run_id in os.listdir(exp_path):
+
+            run_path = os.path.join(
+                exp_path,
+                run_id,
+            )
+
+            params_dir = os.path.join(
+                run_path,
+                "params",
+            )
+
+            metrics_dir = os.path.join(
+                run_path,
+                "metrics",
+            )
+
+            try:
+
+                with open(
+                    os.path.join(params_dir, "model")
+                ) as f:
+                    model = f.read().strip()
+
+                with open(
+                    os.path.join(params_dir, "split")
+                ) as f:
+                    split = f.read().strip()
+
+                if (
+                    split != split_type
+                    or model != target_model
+                ):
+                    continue
+
+                with open(
+                    os.path.join(
+                        metrics_dir,
+                        "best_val_loss",
+                    )
+                ) as f:
+                    last_line = (
+                        f.readlines()[-1]
+                        .strip()
+                        .split()
+                    )
+
+                    val_loss = float(last_line[1])
+
+                checkpoint_path = os.path.join(
+                    run_path,
+                    "artifacts",
+                    "best_model.pth",
+                )
+
+                if val_loss < best_val_loss:
+
+                    best_val_loss = val_loss
+                    best_checkpoint = checkpoint_path
+
+            except Exception:
+                continue
+
+    return best_checkpoint
+
 def run_test_inference(checkpoint_path,split_type,model_type,):
 
     model = load_model(checkpoint_path,model_type,)
@@ -139,58 +228,30 @@ def save_confusion_matrix(cm,output_dir,):
     plt.close()
     
 if __name__ == "__main__":
+    
+    configs = [
+    ("geographic", "cnn"),
+    ("random", "cnn"),
+    ("geographic", "gfm"),
+    ("random", "gfm"),
+]
 
-    final_models = [
-        {
-            "name": "geographic_cnn",
-            "checkpoint": "logs/geographic_split/cnn/models/lr0.001_wd0.0001/best_model.pth",
-            "split_type": "geographic",
-            "model_type": "cnn",
-        },
-        {
-            "name": "random_cnn",
-            "checkpoint": "logs/random_split/cnn/models/lr0.001_wd0.0001/best_model.pth",
-            "split_type": "random",
-            "model_type": "cnn",
-        },
-        {
-            "name": "geographic_gfm",
-            "checkpoint": "logs/geographic_split/gfm/models/lr0.003_wd0.0001/best_model.pth",
-            "split_type": "geographic",
-            "model_type": "gfm",
-        },
-        {
-            "name": "random_gfm",
-            "checkpoint": "logs/random_split/gfm/models/lr0.003_wd0.0001/best_model.pth",
-            "split_type": "random",
-            "model_type": "gfm",
-        },
-    ]
+    for split_type, model_type in configs:
+        checkpoint_path = find_best_checkpoint(
+        split_type,
+        model_type,
+    )
 
-    for model_info in final_models:
+        print(f"\nEvaluating {split_type} {model_type}")
+        print(f"Checkpoint: {checkpoint_path}")
 
-        print(f"Evaluating: {model_info['name']}")
-        
         results = evaluate_model_checkpoint(
-            checkpoint_path=model_info["checkpoint"],
-            split_type=model_info["split_type"],
-            model_type=model_info["model_type"],
+            checkpoint_path=checkpoint_path,
+            split_type=split_type,
+            model_type=model_type,
         )
 
         metrics = results["metrics"]
-        output_dir = os.path.join(
-            "..",
-            "50_evaluation",
-            model_info["split_type"] + "_split",
-            model_info["model_type"],
-            "results",
-        )
-
-        save_confusion_matrix(
-            metrics["cm"],
-            output_dir,
-        )
-        
 
         print(f"Accuracy : {metrics['accuracy']:.4f}")
         print(f"Precision: {metrics['precision']:.4f}")
