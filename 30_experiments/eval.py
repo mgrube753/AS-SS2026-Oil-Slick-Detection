@@ -1,6 +1,3 @@
-"""
-Evaluation on Test Sets
-"""
 import os
 import torch
 import matplotlib.pyplot as plt
@@ -19,9 +16,17 @@ from config import Config
 from model import BaselineCNN, TerraMindClassifier
 from dataloader import get_test_loader
 
-def find_best_checkpoint(split_type, model_type):
+"""
+Evaluation script for best 4 oil slick detection models.
+For each of the configs, 9 subruns were trained using
+different hyperparameters. This module finds the best
+checkpoint per configuration (split & model) from MLflow logs,
+runs inference on the test set, and computes classification metrics.
+"""
 
-    mlflow_dir = "mlflow_extracted/mlflow"
+
+def find_best_checkpoint(split_type, model_type):
+    mlflow_dir = "logs/mlflow"
 
     best_checkpoint = None
     best_val_loss = float("inf")
@@ -34,7 +39,6 @@ def find_best_checkpoint(split_type, model_type):
     target_model = model_map[model_type]
 
     for experiment_id in os.listdir(mlflow_dir):
-
         exp_path = os.path.join(
             mlflow_dir,
             experiment_id,
@@ -44,38 +48,25 @@ def find_best_checkpoint(split_type, model_type):
             continue
 
         for run_id in os.listdir(exp_path):
-
             run_path = os.path.join(
                 exp_path,
                 run_id,
             )
-
             params_dir = os.path.join(
                 run_path,
                 "params",
             )
-
             metrics_dir = os.path.join(
                 run_path,
                 "metrics",
             )
 
             try:
-
-                with open(
-                    os.path.join(params_dir, "model")
-                ) as f:
+                with open(os.path.join(params_dir, "model")) as f:
                     model = f.read().strip()
-
-                with open(
-                    os.path.join(params_dir, "split")
-                ) as f:
+                with open(os.path.join(params_dir, "split")) as f:
                     split = f.read().strip()
-
-                if (
-                    split != split_type
-                    or model != target_model
-                ):
+                if split != split_type or model != target_model:
                     continue
 
                 with open(
@@ -84,12 +75,7 @@ def find_best_checkpoint(split_type, model_type):
                         "best_val_loss",
                     )
                 ) as f:
-                    last_line = (
-                        f.readlines()[-1]
-                        .strip()
-                        .split()
-                    )
-
+                    last_line = f.readlines()[-1].strip().split()
                     val_loss = float(last_line[1])
 
                 checkpoint_path = os.path.join(
@@ -99,7 +85,6 @@ def find_best_checkpoint(split_type, model_type):
                 )
 
                 if val_loss < best_val_loss:
-
                     best_val_loss = val_loss
                     best_checkpoint = checkpoint_path
 
@@ -108,9 +93,17 @@ def find_best_checkpoint(split_type, model_type):
 
     return best_checkpoint
 
-def run_test_inference(checkpoint_path,split_type,model_type,):
 
-    model = load_model(checkpoint_path,model_type,)
+def run_test_inference(
+    checkpoint_path,
+    split_type,
+    model_type,
+):
+
+    model = load_model(
+        checkpoint_path,
+        model_type,
+    )
 
     test_loader, test_ds = get_test_loader(
         data_root=Config.DATA_ROOT,
@@ -131,7 +124,12 @@ def run_test_inference(checkpoint_path,split_type,model_type,):
         "dataset": test_ds,
     }
 
-def compute_metrics(labels,preds,probs,):
+
+def compute_metrics(
+    labels,
+    preds,
+    probs,
+):
     metrics = {
         "accuracy": accuracy_score(labels, preds),
         "precision": precision_score(labels, preds),
@@ -143,20 +141,36 @@ def compute_metrics(labels,preds,probs,):
 
     return metrics
 
-def evaluate_model_checkpoint(checkpoint_path,split_type,model_type,):
-    results = run_test_inference(checkpoint_path,split_type,model_type,)
-    metrics = compute_metrics(results["labels"],results["preds"],results["probs"], )
+
+def evaluate_model_checkpoint(
+    checkpoint_path,
+    split_type,
+    model_type,
+):
+    results = run_test_inference(
+        checkpoint_path,
+        split_type,
+        model_type,
+    )
+    metrics = compute_metrics(
+        results["labels"],
+        results["preds"],
+        results["probs"],
+    )
 
     return {
-    "metrics": metrics,
-    "labels": results["labels"],
-    "preds": results["preds"],
-    "probs": results["probs"],
-    "dataset": results["dataset"],
-}
+        "metrics": metrics,
+        "labels": results["labels"],
+        "preds": results["preds"],
+        "probs": results["probs"],
+        "dataset": results["dataset"],
+    }
 
 
-def load_model(checkpoint_path,model_type,):
+def load_model(
+    checkpoint_path,
+    model_type,
+):
     checkpoint = torch.load(
         checkpoint_path,
         map_location=Config.DEVICE,
@@ -174,29 +188,22 @@ def load_model(checkpoint_path,model_type,):
         )
 
     else:
-        raise ValueError(
-            f"Unknown model type: {model_type}"
-        )
+        raise ValueError(f"Unknown model type: {model_type}")
 
-    model.load_state_dict(
-        checkpoint["model_state_dict"]
-    )
-
+    model.load_state_dict(checkpoint["model_state_dict"])
     model.to(Config.DEVICE)
     model.eval()
 
     return model
 
-def run_model_inference(model, test_loader):
 
+def run_model_inference(model, test_loader):
     all_probs = []
     all_preds = []
     all_labels = []
 
     with torch.no_grad():
-
         for images, labels in test_loader:
-
             images = images.to(Config.DEVICE)
             outputs = model(images)
             probs = torch.sigmoid(outputs).squeeze()
@@ -205,13 +212,17 @@ def run_model_inference(model, test_loader):
             all_preds.extend(preds.cpu().numpy())
             all_labels.extend(labels.cpu().numpy())
 
-    
+    return (
+        all_labels,
+        all_preds,
+        all_probs,
+    )
 
-    return (all_labels, all_preds, all_probs,)
 
-
-        
-def save_confusion_matrix(cm,output_dir,):
+def save_confusion_matrix(
+    cm,
+    output_dir,
+):
     os.makedirs(
         output_dir,
         exist_ok=True,
@@ -226,21 +237,21 @@ def save_confusion_matrix(cm,output_dir,):
         )
     )
     plt.close()
-    
+
+
 if __name__ == "__main__":
-    
     configs = [
-    ("geographic", "cnn"),
-    ("random", "cnn"),
-    ("geographic", "gfm"),
-    ("random", "gfm"),
-]
+        ("geographic", "cnn"),
+        ("random", "cnn"),
+        ("geographic", "gfm"),
+        ("random", "gfm"),
+    ]
 
     for split_type, model_type in configs:
         checkpoint_path = find_best_checkpoint(
-        split_type,
-        model_type,
-    )
+            split_type,
+            model_type,
+        )
 
         print(f"\nEvaluating {split_type} {model_type}")
         print(f"Checkpoint: {checkpoint_path}")
@@ -259,4 +270,3 @@ if __name__ == "__main__":
         print(f"F1 Score : {metrics['f1']:.4f}")
         print(f"AUC ROC  : {metrics['auc']:.4f}")
         print(f"Confusion Matrix:\n{metrics['cm']}")
-        
