@@ -67,10 +67,15 @@ def run_failure_analysis(
 
     split_folder = "random_split" if split_type == "random" else "geographic_split"
 
-    checkpoint_path = find_best_checkpoint(
+    checkpoint_path, best_val_loss, best_run_id = find_best_checkpoint(
         split_type,
         model_type,
     )
+
+    print(f"Best run ID : {best_run_id}")
+    print(f"Checkpoint  : {checkpoint_path}")
+    print(f"Best val loss: {best_val_loss:.6f}")
+
     results = run_test_inference(
         checkpoint_path,
         split_type,
@@ -79,12 +84,17 @@ def run_failure_analysis(
 
     labels = results["labels"]
     preds = results["preds"]
+    probs = results["probs"]
     test_ds = results["dataset"]
 
     fp_indices, fn_indices = get_failure_indices(
         labels,
         preds,
     )
+
+    print(f"Total samples : {len(labels)}")
+    print(f"False Positives: {len(fp_indices)}")
+    print(f"False Negatives: {len(fn_indices)}")
 
     output_dir = os.path.join(
         "..",
