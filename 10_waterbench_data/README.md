@@ -1,16 +1,24 @@
 # [**`10_waterbench_data`**](10_waterbench_data/)
 
-This directory contains the **OilSlick subset** of the [WaterBench](https://huggingface.co/datasets/ayushprd/WaterBench) dataset - a collection of Sentinel-1 SAR image chips (with VV and VH channels) for binary oil slick detection. The dataset also includes Sentinel-2 optical imagery, but this is not used in the experiments of this project.
+This directory contains the OilSlick subset of the [WaterBench](https://huggingface.co/datasets/ayushprd/WaterBench) dataset - a collection of Sentinel-1 SAR image chips (with VV and VH channels) for binary oil slick detection. The dataset also includes Sentinel-2 optical imagery, but this is not used in the experiments of this project.
 
-## Setting up the Dataset
+## Contents
+
+| Path | Description |
+|---|---|
+| `data/OilSlick/metadata.json` | Dataset schema (columns, task, spatial OOD info) |
+| `data/OilSlick/metadata.csv` | Raw metadata for all 1,363 samples (Sentinel-2 based) |
+| `data/OilSlick/images_s1/` | 2-band GeoTIFFs (VV + VH, Sentinel-1 SAR) |
+| `data/OilSlick/splits/random/` | In-distribution random split (train / val / test) |
+| `data/OilSlick/splits/geographic/` | Geographic split (train / val / test) with Mediterranean as OOD test set |
+
+## Setup
 
 After running the [`../setup_data.sh`](../setup_data.sh) script, the desired dataset is located in the [`10_waterbench_data/`](./) directory.
 
-The structure is as follows. You will find a [`data/OilSlick`](data/OilSlick/) directory, containing the TIFF imagery [`images_s1/`](data/OilSlick/images_s1/). Besides, two data splits for RQ1 are provided in [`splits/`](data/OilSlick/splits/): a random split and a geographic split (with Mediterranean as out-of-distribution region), containing each training, validation and test split data in a separate text file.
+> **Note**: The full OilSlick SAR imagery may not be fully available on Hugging Face. Please get the whole imagery set after running the script from the [Google Drive mirror](https://drive.google.com/file/d/1yv23B9PtfBD10j2VcYs5JCcdHOOXcI4S/view?usp=sharing) into `data/OilSlick/images_s1/`.
 
-> **Note**: The full OilSlick SAR imagery may not be fully available on Hugging Face. Please get the whole imagary set after running the script from the [Google Drive mirror](https://drive.google.com/file/d/1yv23B9PtfBD10j2VcYs5JCcdHOOXcI4S/view?usp=sharing) into `data/OilSlick/images_s1/`.
-
-## Disclaimer to Metadata
+## Metadata Disclaimer
 
 The main purpose of WaterBench is focusing on the Sentinel-2 optical imagery, but in this project, we only use the Sentinel-1 SAR imagery. By this, the [`metadata.csv`](data/OilSlick/metadata.csv) and [`metadata.json`](data/OilSlick/metadata.json) are mainly useful for the Sentinel-2 imagery (e.g. cloud cover, reflectance), and not applicable to the Sentinel-1 SAR chips throughout this project.
 

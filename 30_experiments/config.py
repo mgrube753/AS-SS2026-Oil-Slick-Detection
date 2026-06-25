@@ -1,8 +1,9 @@
 import torch
 
 """
-Config class with grid search parameters for both models, as well as other constants.
-missing: mlflow logging (train/val), so we can better track progress/fails
+Config class with grid search parameters for both models,
+as well as other constants (device, batch size, epochs, 
+learning rates, weight decays, early stopping patience).
 """
 
 
