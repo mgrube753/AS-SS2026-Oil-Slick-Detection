@@ -84,15 +84,8 @@ For further experimental details, please refer to the [`30_experiments/`](30_exp
 1. After running the experiments and obtaining the best model checkpoints for the 4 experimental configurations, evaluation is crucial. Run [`eval.py`](30_experiments/eval.py) and [`failure_analysis.py`](30_experiments/failure_analysis.py) in [`30_experiments/`](30_experiments/) as follows:
 
     ```bash
-    python eval.py --model-name baselinecnn --split-type random
-    python eval.py --model-name baselinecnn --split-type geographic
-    python eval.py --model-name terramind --split-type random
-    python eval.py --model-name terramind --split-type geographic
-
-    python failure_analysis.py --model-name baselinecnn --split-type random
-    python failure_analysis.py --model-name baselinecnn --split-type geographic
-    python failure_analysis.py --model-name terramind --split-type random
-    python failure_analysis.py --model-name terramind --split-type geographic
+    python eval.py
+    python failure_analysis.py
     ```
 
     By this, results are obtained and visualized for the checkpoints, which are then saved in [`50_evaluation/`](50_evaluation/) respectively. The evaluation includes inference on the test set (just the respective one, or maybe both test split sets for each model?), calculation of evaluation metrics, and also creating confusion matrices.
@@ -105,3 +98,7 @@ For further experimental details, please refer to the [`30_experiments/`](30_exp
     ```
 
     For the GFM, no XAI method is applied, due to time constraints. For future work, it would be interesting to apply XAI to the GFM as a comparison to the CNN baseline.
+
+## License
+
+This project is licensed under the [CC-BY-4.0 License](https://creativecommons.org/licenses/by/4.0/).

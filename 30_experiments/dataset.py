@@ -55,20 +55,4 @@ class OilSlickDataset(Dataset):
         if self.transform:
             img_tensor = self.transform(img_tensor)
 
-        # temporary visualization to check if the data looks correct
-        # RUN THIS by using inference.py
-        # todo BEFORE UNCOMMENTING: set num_workers=0 in dataloader.py
-        # import matplotlib.pyplot as plt
-
-        # fig, axes = plt.subplots(1, 2, figsize=(10, 5))
-        # fig.suptitle(f"Image: {img_id}_s1.tif", fontsize=14)
-        # axes[0].imshow(img_tensor[0].numpy(), cmap="gray")
-        # axes[0].set_title(f"VV - Label: {label}")
-        # axes[1].imshow(img_tensor[1].numpy(), cmap="gray")
-        # print(img_tensor[0].numpy())
-        # print(img_tensor[1].numpy())
-        # axes[1].set_title(f"VH - Label: {label}")
-        # plt.tight_layout()
-        # plt.show()
-
         return img_tensor, torch.tensor(label, dtype=torch.long)

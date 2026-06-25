@@ -7,6 +7,7 @@ __pycache__/
 .vscode
 10_waterbench_data/*
 !10_waterbench_data/.gitkeep
+!10_waterbench_data/README.md
 filtered_metadata.csv
 split_stats.json
 30_experiments/logs/**/*
