@@ -1,6 +1,7 @@
 import os
 import torch
 import matplotlib.pyplot as plt
+import csv
 
 from sklearn.metrics import (
     accuracy_score,
@@ -10,6 +11,7 @@ from sklearn.metrics import (
     roc_auc_score,
     confusion_matrix,
     ConfusionMatrixDisplay,
+    classification_report,
 )
 
 from config import Config
@@ -30,6 +32,7 @@ def find_best_checkpoint(split_type, model_type):
 
     best_checkpoint = None
     best_val_loss = float("inf")
+    best_run_id = None
 
     model_map = {
         "cnn": "baselinecnn",
@@ -87,11 +90,12 @@ def find_best_checkpoint(split_type, model_type):
                 if val_loss < best_val_loss:
                     best_val_loss = val_loss
                     best_checkpoint = checkpoint_path
+                    best_run_id = run_id
 
             except Exception:
                 continue
 
-    return best_checkpoint
+    return best_checkpoint, best_val_loss, best_run_id
 
 
 def run_test_inference(
@@ -239,6 +243,118 @@ def save_confusion_matrix(
     plt.close()
 
 
+def save_probability_histogram(
+    labels,
+    probs,
+    output_dir,
+):
+    os.makedirs(
+        output_dir,
+        exist_ok=True,
+    )
+
+    plt.figure(figsize=(8, 5))
+    plt.hist(
+        [probs[i] for i in range(len(labels)) if labels[i] == 0],
+        bins=30,
+        alpha=0.6,
+        label="Negative (class 0)",
+    )
+    plt.hist(
+        [probs[i] for i in range(len(labels)) if labels[i] == 1],
+        bins=30,
+        alpha=0.6,
+        label="Positive (class 1)",
+    )
+    plt.axvline(0.5, color="red", linestyle="--", label="Threshold=0.5")
+    plt.xlabel("Predicted probability")
+    plt.ylabel("Frequency")
+    plt.legend()
+    plt.title("Prediction probability distribution by true class")
+
+    plt.savefig(
+        os.path.join(
+            output_dir,
+            "probability_histogram.png",
+        )
+    )
+    plt.close()
+
+
+def save_classification_report(
+    labels,
+    preds,
+    output_dir,
+):
+    os.makedirs(
+        output_dir,
+        exist_ok=True,
+    )
+
+    report = classification_report(
+        labels,
+        preds,
+        target_names=["No Slick (0)", "Oil Slick (1)"],
+        digits=4,
+    )
+    print(report)
+
+    report_path = os.path.join(
+        output_dir,
+        "classification_report.txt",
+    )
+    with open(report_path, "w") as f:
+        f.write(report)
+
+    print(f"Classification report saved to: {os.path.abspath(report_path)}")
+
+
+def save_predictions_csv(
+    labels,
+    preds,
+    probs,
+    split_type,
+    model_type,
+    output_dir,
+):
+    os.makedirs(
+        output_dir,
+        exist_ok=True,
+    )
+
+    csv_path = os.path.join(
+        output_dir,
+        "test_predictions.csv",
+    )
+    with open(csv_path, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(
+            [
+                "index",
+                "true_label",
+                "pred_label",
+                "probability",
+                "correct",
+            ]
+        )
+
+        for i, (y_true, y_pred, prob) in enumerate(
+            zip(labels, preds, probs)
+        ):
+            writer.writerow(
+                [
+                    i,
+                    y_true,
+                    y_pred,
+                    f"{prob:.6f}",
+                    int(y_true == y_pred),
+                ]
+            )
+
+    print(
+        f"Predictions CSV saved to: {os.path.abspath(csv_path)}"
+    )
+
 if __name__ == "__main__":
     configs = [
         ("geographic", "cnn"),
@@ -248,13 +364,15 @@ if __name__ == "__main__":
     ]
 
     for split_type, model_type in configs:
-        checkpoint_path = find_best_checkpoint(
+        checkpoint_path, best_val_loss, best_run_id = find_best_checkpoint(
             split_type,
             model_type,
         )
 
         print(f"\nEvaluating {split_type} {model_type}")
-        print(f"Checkpoint: {checkpoint_path}")
+        print(f"Best run ID : {best_run_id}")
+        print(f"Checkpoint  : {checkpoint_path}")
+        print(f"Best val loss: {best_val_loss:.6f}")
 
         results = evaluate_model_checkpoint(
             checkpoint_path=checkpoint_path,
@@ -270,3 +388,41 @@ if __name__ == "__main__":
         print(f"F1 Score : {metrics['f1']:.4f}")
         print(f"AUC ROC  : {metrics['auc']:.4f}")
         print(f"Confusion Matrix:\n{metrics['cm']}")
+
+        fp = metrics["cm"][0, 1]
+        fn = metrics["cm"][1, 0]
+        tp = metrics["cm"][1, 1]
+        tn = metrics["cm"][0, 0]
+        print(f"TP={tp}  TN={tn}  FP={fp}  FN={fn}")
+
+        split_folder = "random_split" if split_type == "random" else "geographic_split"
+        output_dir = os.path.join(
+            "..",
+            "50_evaluation",
+            split_folder,
+            model_type,
+            "results",
+        )
+        save_confusion_matrix(
+            metrics["cm"],
+            output_dir,
+        )
+        save_probability_histogram(
+            results["labels"],
+            results["probs"],
+            output_dir,
+        )
+        save_classification_report(
+            results["labels"],
+            results["preds"],
+            output_dir,
+        )
+        save_predictions_csv(
+            results["labels"],
+            results["preds"],
+            results["probs"],
+            split_type,
+            model_type,
+            output_dir,
+        )
+        
