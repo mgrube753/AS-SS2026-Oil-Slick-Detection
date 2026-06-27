@@ -3,6 +3,7 @@
 [![Python 3.12.4](https://img.shields.io/badge/python-3.12.4-blue.svg)](https://www.python.org/downloads/release/python-3120/)
 [![Repo Size](https://img.shields.io/github/repo-size/mgrube753/AS-SS2026-Oil-Slick-Detection.svg)](https://github.com/mgrube753/AS-SS2026-Oil-Slick-Detection)
 [![University of Rostock](https://img.shields.io/badge/Institution-University_of_Rostock-003D7A.svg)](https://www.uni-rostock.de/)
+[![CC-BY-4.0 License](https://img.shields.io/badge/License-CC--BY--4.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 
 This repository contains the code, data, and documentation for the Area Seminar "Deep Learning for Maritime Vision Applications" (summer semester 2026) at the University of Rostock. The project deals with the detection of oil slicks in Sentinel-1 SAR imagery. Therefore, a subset of the WaterBench dataset is provided, named OilSlick, which includes Sentinel-1 SAR chips for the project task.
 
@@ -10,6 +11,18 @@ The research questions of the project are:
 
 - **RQ1:** How well can deep learning detect oil slicks in Sentinel-1 SAR imagery, and how does performance change between an in-distribution random split and a geographic out-of-distribution split (Mediterranean)?
 - **RQ2:** (Optional:) Can a Geospatial Foundation Model (GFM) improve over a Convolutional Neural Network (CNN) baseline, and what Explainable AI (XAI) methods reveal about the features which drive the predictions.
+
+## Repository Overview
+
+| Directory | Description |
+|---|---|
+| [`10_waterbench_data/`](10_waterbench_data/) | WaterBench OilSlick data subset (Sentinel-1 SAR imagery, splits) |
+| [`20_data_analysis/`](20_data_analysis/) | Exploratory Data Analysis, filtering, normalization stats |
+| [`30_experiments/`](30_experiments/) | Training pipeline, models, evaluation, failure analysis done |
+| [`40_documentation/`](40_documentation/) | Documentation files for all Python modules |
+| [`50_evaluation/`](50_evaluation/) | Evaluation results (evaluation metrics, confusion matrices, failure cases) |
+| [`60_ode_document/`](60_ode_document/) | ODE Guide Document (LaTeX) |
+| [`70_poster/`](70_poster/) | Scientific poster for final presentation (LaTeX) |
 
 ## Getting Started
 
@@ -45,7 +58,7 @@ The progress bar may appear delayed, but the download is progressing in the back
 
 ## Exploration of Data
 
-The [`20_data_analysis/`](20_data_analysis/) directory contains a Jupyter Notebook thats provides an exploratory data analysis of the dataset, incuding dataset information, statistics and according visualizations, plots of sample SAR chips, and a filtering process to enhance the validity of the OilSlick dataset. The filtered dataset and the resulting metadata (stored in [`20_data_analysis/`](20_data_analysis/) after execution) are then used for further experimenting.
+The [`20_data_analysis/`](20_data_analysis/) directory contains a Jupyter Notebook that provides an exploratory data analysis of the dataset, including dataset information, statistics and according visualizations, plots of sample SAR chips, and a filtering process to enhance the validity of the OilSlick dataset. The filtered dataset and the resulting metadata (stored in [`20_data_analysis/`](20_data_analysis/) after execution) are then used for further experimenting.
 
 ## Run Experiments & Monitor Results
 
@@ -61,9 +74,9 @@ The [`20_data_analysis/`](20_data_analysis/) directory contains a Jupyter Notebo
     ```
 
     Each of the 4 runs executes grid search over model-specific hyperparameter set combinations. This includes 3 learning rates and 3 weight decays for each model, resulting in 4x3x3=36 model trainings in total.
-2. While the experiments are running, you can monitor the training progress and loggings using MLflow. Run the respective command in [`30_experiments/`](30_experiments/) to start the MLflow UI:
+2. While the experiments are running, you can monitor the training progress and logs using MLflow. Run the respective command in [`30_experiments/`](30_experiments/) to start the MLflow UI:
 
-    Linux (and probably MacOS):
+    Linux / MacOS:
 
     ```bash
     export MLFLOW_ALLOW_FILE_STORE=true && mlflow ui --backend-store-uri file:///$(pwd)/logs/mlflow
@@ -75,7 +88,7 @@ The [`20_data_analysis/`](20_data_analysis/) directory contains a Jupyter Notebo
     set MLFLOW_ALLOW_FILE_STORE=true && mlflow ui --backend-store-uri file:///%cd%/logs/mlflow
     ```
 
-    The UI can be accessed by opening a web browser for [`http://127.0.0.1:5000`](http://127.0.0.1:5000). There, you can see the 4 experimental runs, and in each run, you can see the 9 model trainings with their individual hyperparameter combinations and loggings.
+    The UI can be accessed by opening a web browser for [`http://127.0.0.1:5000`](http://127.0.0.1:5000). There, you can see the 4 experimental runs, and in each run, you can see the 9 model trainings with their individual hyperparameter combinations and logs.
 
 For further experimental details, please refer to the [`30_experiments/`](30_experiments/) directory and its [`README.md`](30_experiments/README.md) file. For each Python file, a documentation file is also provided in [`40_documentation/`](40_documentation/) to understand the task, the classes and the functions.
 
@@ -88,16 +101,9 @@ For further experimental details, please refer to the [`30_experiments/`](30_exp
     python failure_analysis.py
     ```
 
-    By this, results are obtained and visualized for the checkpoints, which are then saved in [`50_evaluation/`](50_evaluation/) respectively. The evaluation includes inference on the test set (just the respective one, or maybe both test split sets for each model?), calculation of evaluation metrics, and also creating confusion matrices.
+    By this, results are obtained and visualized for these 4 checkpoints, which are then saved in [`50_evaluation/`](50_evaluation/) respectively. The evaluation includes inference on the test set, calculation of evaluation metrics, and also creating confusion matrices. According to the failure analysis, the misclassified samples (false positives and false negatives) are visualized and saved in [`50_evaluation/`](50_evaluation/) as well for further purposes.
 
-2. For the CNN baseline, Grad-CAM is applied as an XAI method to visualize the respective features which drive the model's predictions. The visualized heatmaps are also saved in [`50_evaluation/`](50_evaluation/) for the respective split types. Run the following command for Grad-CAM:
-
-    ```bash
-    python gradcam.py --model-name baselinecnn --split-type random
-    python gradcam.py --model-name baselinecnn --split-type geographic
-    ```
-
-    For the GFM, no XAI method is applied, due to time constraints. For future work, it would be interesting to apply XAI to the GFM as a comparison to the CNN baseline.
+2. For both models, the baseline CNN and the Terramind GFM, no XAI method is applied, due to time constraints. For future work, it would be interesting to apply certain XAI methods to both model architectures.
 
 ## License
 
