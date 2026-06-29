@@ -229,9 +229,8 @@
                           \edef\w@test{#2}\relax
                           \ifx\w@test\@empty{}\else\label{#2}\fi
                           \begin{minipage}{1.0\linewidth}
-                            \begin{small}
-                              {\sc \protect\figurename} \arabic{figure}: #3
-                            \end{small}
+                            \small\vspace{8pt}
+                              {\bf \protect\figurename} {\bf \arabic{figure}.} #3
                           \end{minipage}
                           \nobreak\medskip\relax
                             }
