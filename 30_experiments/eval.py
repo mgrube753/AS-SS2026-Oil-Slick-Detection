@@ -234,6 +234,7 @@ def save_confusion_matrix(
 
     disp = ConfusionMatrixDisplay(cm)
     disp.plot()
+    disp.plot(text_kw={"fontsize": 20})
     plt.savefig(
         os.path.join(
             output_dir,
@@ -338,9 +339,7 @@ def save_predictions_csv(
             ]
         )
 
-        for i, (y_true, y_pred, prob) in enumerate(
-            zip(labels, preds, probs)
-        ):
+        for i, (y_true, y_pred, prob) in enumerate(zip(labels, preds, probs)):
             writer.writerow(
                 [
                     i,
@@ -351,9 +350,8 @@ def save_predictions_csv(
                 ]
             )
 
-    print(
-        f"Predictions CSV saved to: {os.path.abspath(csv_path)}"
-    )
+    print(f"Predictions CSV saved to: {os.path.abspath(csv_path)}")
+
 
 if __name__ == "__main__":
     configs = [
@@ -425,4 +423,3 @@ if __name__ == "__main__":
             model_type,
             output_dir,
         )
-        
