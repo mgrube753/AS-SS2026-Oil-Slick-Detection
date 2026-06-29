@@ -24,6 +24,10 @@
   tablename=Tab.
 }
 
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{caption}
+
 \title{Oil Slick Detection in Sentinel-1 Data}
 \subtitle{Using a CNN Baseline \& the Geospatial Foundation Model Terramind}
 
@@ -49,21 +53,67 @@
 
 \nocite{Jakubik_2025_ICCV}
 
-\section{Test 1}
-\subsection{Test 1.1}
-\lipsum[1-3]
+\section{Motivation}
 
-\section{Test 2}
-\subsection{Test 2.1}
-\lipsum[4-6]
+Oil slicks ... Sentinel-1 SAR imagery ...
 
-\section{Test 3}
-\subsection{Test 3.1}
-\lipsum[7-9]
+Our research questions (RQs) are as follows:
 
-\section{Test 4}
-\subsection{Test 4.1}
-\lipsum[10-12]
+\begin{itemize}
+  \item \textbf{RQ1:} How well can deep learning detect oil slicks in Sentinel-1 SAR imagery, and how does performance change between an in-distribution random split and a geographic out-of-distribution split (Mediterranean)?
+  \item \textbf{RQ2:} Can a Geospatial Foundation Model improve over a CNN baseline, and what do XAI methods reveal about the features that drive the predictions?
+\end{itemize}
+
+\section{Methodology}
+Our methodology is structured as follows:
+\begin{itemize}
+  \item \textbf{CNN baseline} trained from scratch on OilSlick
+  \item \textbf{Terramind} \cite{Jakubik_2025_ICCV} trained while freezing the backbone and only training a classification head on OilSlick
+  \item \textbf{Grid search} performed for both models (36 training runs)
+  \item \textbf{Find best model} (based on val loss) for each model and split type (4 total) for individual final test set evaluation.
+\end{itemize}
+
+Before training, data analysis was performed, to understand the data distribution and apply imagery filtering.
+
+\myfigure{0}{map.png}{0.95}{}{Geographic map depicting the global areas of captured positive and negative oil slick samples. Positive: red (ships), yellow (platforms), and green (natural seeps).  Negative: blue.}
+
+Data filtering was crucial for this project, by finding corrupt TIFF files and imagery with >= 40\% of nodata in it.
+
+\myfigure{0}{filtering.png}{0.95}{}{Filtering of OilSlick's Sentinel-1 data subset. The blue bars represent the number of images before filtering, while the orange bars represent the number of images after filtering.}
+
+
+\section{Results}
+% \subsection{Test 3.1}
+\begin{center}
+  \normalsize
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabular*}{.95\linewidth}{@{\extracolsep{\fill}} l l c c c c c @{}}
+    \toprule
+    \textbf{Split} & \textbf{Model} & \textbf{Class} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} & \textbf{n} \\
+    \midrule
+    \multirow{2}{*}{Geographic}
+      & \multirow{2}{*}{CNN}
+      & No Slick & 0.7925 & 0.5600 & 0.6562 & 75 \\
+      & & \textit{Oil Slick} & 0.6250 & 0.8333 & 0.7143 & 66 \\[5pt]
+    \multirow{2}{*}{Geographic}
+      & \multirow{2}{*}{GFM}
+      & No Slick & \textbf{0.8333} & 0.5333 & 0.6504 & 75 \\
+      & & \textit{Oil Slick} & 0.6237 & 0.8788 & 0.7296 & 66 \\[5pt]
+    \multirow{2}{*}{Random}
+      & \multirow{2}{*}{CNN}
+      & No Slick & 0.6957 & \textbf{0.6612} & \textbf{0.6780} & 121 \\
+      & & \textit{Oil Slick} & \textbf{0.7285} & 0.7586 & 0.7432 & 145 \\[5pt]
+    \multirow{2}{*}{Random}
+      & \multirow{2}{*}{GFM}
+      & No Slick & 0.7895 & 0.4959 & 0.6091 & 121 \\
+      & & \textit{Oil Slick} & 0.6789 & \textbf{0.8897} & \textbf{0.7701} & 145 \\
+    \bottomrule
+  \end{tabular*}
+  \captionof{table}{Evaluation results on the test sets across both geographic and random splits for each model. The best results for each class (\textit{No Slick}, \textit{Oil Slick}) are highlighted in bold (per metric).}
+\end{center}
+
+\section{Conclusion \& Future Work}
+Answering the RQs. Plus, where we had issues. Which aspects are useful for future work?
 
 \printbibliography
 
