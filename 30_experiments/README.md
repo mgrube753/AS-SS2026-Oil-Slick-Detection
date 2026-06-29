@@ -125,9 +125,129 @@ All runs logged to `logs/mlflow/` with:
 
 ### Quick Start
 
+Run all 4 training configurations (each performs a grid search over 9 hyperparameter combinations):
+
 ```bash
-# Train BaselineCNN with random split (grid search over 9 hyperparameter combinations)
+# 1. Train BaselineCNN with random split (9 subruns)
 python runner.py --model-name baselinecnn --split-type random
 
-# Train TerraMind with geographic split
+# 2. Train BaselineCNN with geographic split (9 subruns)
+python runner.py --model-name baselinecnn --split-type geographic
+
+# 3. Train TerraMind with random split (9 subruns)
+python runner.py --model-name terramind --split-type random
+
+# 4. Train TerraMind with geographic split (9 subruns)
 python runner.py --model-name terramind --split-type geographic
+```
+
+**Total**: 4 configurations × 9 subruns = **36 trained models**
+
+### Grid Search Execution
+
+Each command above performs grid search over the hyperparameter combinations defined in `config.py`. Training progress and metrics are logged to MLflow in `logs/mlflow/`.
+
+### Evaluation & Analysis
+
+```bash
+# Evaluate best checkpoint per (model, split) configuration on test set
+python eval.py
+
+# Outputs:
+# - Test metrics (accuracy, precision, recall, F1, AUC-ROC)
+# - Confusion matrices
+# - Probability histograms
+# - Classification reports
+# - Prediction CSVs (../50_evaluation/)
+
+# Analyze false positives and false negatives
+python failure_analysis.py
+
+# Outputs:
+# - Visualized FP/FN examples with VV and VH channels
+# - Saved to ../50_evaluation/
+```
+
+## Output Structure
+
+After complete training and evaluation:
+
+```bash
+30_experiments/
+├── config.py
+├── dataloader.py
+├── dataset.py
+├── model.py
+├── train.py
+├── runner.py
+├── eval.py
+├── failure_analysis.py
+├── utils.py
+├── README.md
+└── logs/
+    ├── mlflow/                                  # MLflow tracking data
+    │   └── <experiment-id>/<run-id>/...
+    ├── random_split/
+    │   ├── cnn/
+    │   │   └── models/lr<LR>_wd<WD>/
+    │   │       ├── best_model.pth
+    │   │       └── final_model.pth
+    │   └── gfm/
+    │       └── models/lr<LR>_wd<WD>/
+    │           ├── best_model.pth
+    │           └── final_model.pth
+    └── geographic_split/
+        ├── cnn/
+        │   └── models/lr<LR>_wd<WD>/
+        │       ├── best_model.pth
+        │       └── final_model.pth
+        └── gfm/
+            └── models/lr<LR>_wd<WD>/
+                ├── best_model.pth
+                └── final_model.pth
+```
+
+## Configuration Details
+
+### Hardware & Reproducibility
+
+- **Device**: Automatically selects CUDA if available, falls back to CPU
+- **Seed**: Fixed at 42 for reproducibility across all runs
+- **Mixed Precision**: Not used; full float32 precision
+- **Number of Workers**: 8 for data loading
+
+### Key Dependencies
+
+- PyTorch with CUDA support
+- Torchvision (transforms, models)
+- TerraTorch (pre-trained backbone registry)
+- scikit-learn (metrics)
+- MLflow (experiment tracking)
+- tifffile (GeoTIFF reading)
+- pandas (metadata handling)
+
+## Results & Interpretation
+
+### Metrics Computed
+
+For each model on the test set:
+- **Accuracy**: Overall correctness
+- **Precision**: Positive prediction accuracy (minimize false alarms)
+- **Recall**: True positive rate (minimize missed detections)
+- **F1 Score**: Harmonic mean of precision and recall
+- **AUC-ROC**: Area under receiver operating curve
+- **Confusion Matrix**: TP, TN, FP, FN breakdown
+
+### Failure Analysis
+
+For each configuration, false positives and false negatives are visualized to identify:
+- Misclassified ambiguous regions
+- Model-specific weaknesses
+- Potential dataset annotation issues
+
+## Notes
+
+- All statistics (mean, std) derived from **training set only** to prevent data leakage
+- Validation set used for early stopping; not for hyperparameter selection
+- Test set completely held out until final evaluation
+- Geographic split serves as an out-of-distribution evaluation benchmark
