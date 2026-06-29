@@ -53,11 +53,15 @@
 
 \nocite{Jakubik_2025_ICCV}
 
-\section{Motivation}
+\section{Introduction} \vspace{-1em}
+\subsection{Motivation} \vspace{-2em}
 
-Oil slicks ... Sentinel-1 SAR imagery ...
+\begin{itemize}
+  \item Oil slicks ...
+  \item Sentinel-1 SAR imagery ...
+\end{itemize}
 
-Our research questions (RQs) are as follows:
+\subsection{Research Questions} \vspace{-2em}
 
 \begin{itemize}
   \item \textbf{RQ1:} How well can deep learning detect oil slicks in Sentinel-1 SAR imagery, and how does performance change between an in-distribution random split and a geographic out-of-distribution split (Mediterranean)?
@@ -65,22 +69,22 @@ Our research questions (RQs) are as follows:
 \end{itemize}
 
 \section{Methodology}
-Our methodology is structured as follows:
+\subsection{Overall Setup} \vspace{-2em}
 \begin{itemize}
   \item \textbf{CNN baseline} trained from scratch on OilSlick
   \item \textbf{Terramind} \cite{Jakubik_2025_ICCV} trained while freezing the backbone and only training a classification head on OilSlick
-  \item \textbf{Grid search} performed for both models (36 training runs)
+  \item \textbf{Grid search} performed for both models (36 total training runs)
   \item \textbf{Find best model} (based on val loss) for each model and split type (4 total) for individual final test set evaluation.
 \end{itemize}
 
-Before training, data analysis was performed, to understand the data distribution and apply imagery filtering.
+\subsection{Crucial Steps before Training} \vspace{-2em}
+\begin{itemize}
+  \item \textbf{Data analysis} $\to$ understand data distributions and apply imagery filtering.
+  \item \textbf{Data filtering} was crucial for this project, by finding corrupt TIFF files and imagery with >= 40\% of nodata in it.
 
-\myfigure{0}{map.png}{0.95}{}{Geographic map depicting the global areas of captured positive and negative oil slick samples. Positive: red (ships), yellow (platforms), and green (natural seeps).  Negative: blue.}
-
-Data filtering was crucial for this project, by finding corrupt TIFF files and imagery with >= 40\% of nodata in it.
+\end{itemize}
 
 \myfigure{0}{filtering.png}{0.95}{}{Filtering of OilSlick's Sentinel-1 data subset. The blue bars represent the number of images before filtering, while the orange bars represent the number of images after filtering.}
-
 
 \section{Results}
 % \subsection{Test 3.1}
@@ -112,8 +116,30 @@ Data filtering was crucial for this project, by finding corrupt TIFF files and i
   \captionof{table}{Evaluation results on the test sets across both geographic and random splits for each model. The best results for each class (\textit{No Slick}, \textit{Oil Slick}) are highlighted in bold (per metric).}
 \end{center}
 
+\begin{center}
+  \begin{tabular}{cc}
+    \includegraphics[width=0.40\linewidth]{../50_evaluation/random\_split/cnn/results/confusion_matrix.png} &
+    \includegraphics[width=0.40\linewidth]{../50_evaluation/random\_split/gfm/results/confusion_matrix.png} \\
+    \small (a) Baseline CNN: Random Split &
+    \small (b) Terramind: Random Split \\
+    \includegraphics[width=0.40\linewidth]{../50_evaluation/geographic\_split/cnn/results/confusion_matrix.png} &
+    \includegraphics[width=0.40\linewidth]{../50_evaluation/geographic\_split/gfm/results/confusion_matrix.png} \\
+    \small (c) Baseline CNN: Geographic Split &
+    \small (d) Terramind: Geographic Split \\
+  \end{tabular}
+  \captionof{figure}{Confusion matrices for the individual test sets across random and geographic splits for each final model.}
+\end{center}
+
+\myfigure{0}{../50_evaluation/random\_split/cnn/results/failure\_analysis/false\_negatives/fn\_251.png}{0.75}{}{Example SAR chip from the \textit{Random} test set, classified as \textit{No Slick} by the CNN baseline, which is a \textbf{False Negative (FN)}.}
+
+\myfigure{0}{../50\_evaluation/geographic\_split/gfm/results/failure\_analysis/false\_positives/fp_18.png}{0.75}{}{Example SAR chip from the \textit{Geographic} test set, classified as \textit{Slick} by the Terramind model, which is a \textbf{False Positive (FP)}.}
+
 \section{Conclusion \& Future Work}
-Answering the RQs. Plus, where we had issues. Which aspects are useful for future work?
+\begin{itemize}
+  \item Answering RQs
+  \item Where we had issues
+  \item Which aspects useful for future work
+\end{itemize}
 
 \printbibliography
 
