@@ -114,7 +114,7 @@ def get_train_val_loaders(data_root, batch_size=16, split_type="random", seed=42
         batch_size=batch_size,
         shuffle=True,
         num_workers=8,
-        # pin_memory=True,
+        pin_memory=True if torch.cuda.is_available() else False,
         generator=g,
     )
     val_loader = DataLoader(
@@ -122,7 +122,7 @@ def get_train_val_loaders(data_root, batch_size=16, split_type="random", seed=42
         batch_size=batch_size,
         shuffle=False,
         num_workers=8,
-        # pin_memory=True,
+        pin_memory=True if torch.cuda.is_available() else False,
         generator=g,
     )
 
@@ -144,7 +144,7 @@ def get_test_loader(data_root, batch_size=16, split_type="random", seed=42):
         batch_size=batch_size,
         shuffle=False,
         num_workers=8,
-        # pin_memory=True,
+        pin_memory=True if torch.cuda.is_available() else False,
         generator=g,
     )
 
