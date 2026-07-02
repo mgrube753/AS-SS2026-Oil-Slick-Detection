@@ -54,40 +54,39 @@
 \nocite{Jakubik_2025_ICCV}
 
 \section{Introduction} \vspace{-1em}
-\subsection{Motivation} \vspace{-2em}
+\subsection{Project Motivation} \vspace{-2em}
 
 \begin{itemize}
-  \item Oil slicks ...
-  \item Sentinel-1 SAR imagery ...
+  \item \textbf{Oil slicks} $\to$ severe damage \& hard to monitor manually
+  \item \textbf{Sentinel-1 SAR imagery} $\to$ day / night / all-weather monitoring possible
+  \item \textbf{Short surface waves} $\to$ slicks as dark patches in SAR imagery
 \end{itemize}
 
 \subsection{Research Questions} \vspace{-2em}
 
-\begin{itemize}
-  \item \textbf{RQ1:} How well can deep learning detect oil slicks in Sentinel-1 SAR imagery, and how does performance change between an in-distribution random split and a geographic out-of-distribution split (Mediterranean)?
-  \item \textbf{RQ2:} Can a Geospatial Foundation Model improve over a CNN baseline, and what do XAI methods reveal about the features that drive the predictions?
-\end{itemize}
+  \textbf{RQ1:} How well can deep learning detect oil slicks in Sentinel-1 SAR imagery, and how does performance change between an in-distribution random split and a geographic out-of-distribution split (Mediterranean)? \vspace{1em} \\
+  \textbf{RQ2:} Can a Geospatial Foundation Model improve over a CNN baseline, and what do XAI methods reveal about the features that drive the predictions?
 
 \section{Methodology}
-\subsection{Overall Setup} \vspace{-2em}
+\subsection{Experimental Setup} \vspace{-2em}
 \begin{itemize}
-  \item \textbf{CNN baseline} trained from scratch on OilSlick
-  \item \textbf{Terramind} \cite{Jakubik_2025_ICCV} trained while freezing the backbone and only training a classification head on OilSlick
-  \item \textbf{Grid search} performed for both models (36 total training runs)
-  \item \textbf{Find best model} (based on val loss) for each model and split type (4 total) for individual final test set evaluation.
+  \item \textbf{CNN baseline} $\to$ trained from scratch on OilSlick
+  \item \textbf{Terramind} \cite{Jakubik_2025_ICCV} $\to$ frozen backbone, only training a classification head
+  \item \textbf{Grid search} $\to$ performed for both models (36 total training runs)
+  \item \textbf{Find best configuration} $\to$ based on val loss for each model \& split
+  \item \textbf{Final evaluation} $\to$ 4 final models $\to$ individual test set
 \end{itemize}
 
 \subsection{Crucial Steps before Training} \vspace{-2em}
 \begin{itemize}
-  \item \textbf{Data analysis} $\to$ understand data distributions and apply imagery filtering.
-  \item \textbf{Data filtering} was crucial for this project, by finding corrupt TIFF files and imagery with >= 40\% of nodata in it.
-
+  \item \textbf{Data analysis} $\to$ understand data distributions \& apply imagery filtering
+  \item \textbf{Data filtering} $\to$ find corrupt TIFF files \& imagery with >= 40\% of nodata
 \end{itemize}
 
 \myfigure{0}{filtering.png}{0.95}{}{Filtering of OilSlick's Sentinel-1 data subset. The blue bars represent the number of images before filtering, while the orange bars represent the number of images after filtering.}
 
 \section{Results}
-% \subsection{Test 3.1}
+\subsection{Test Set-based Evaluation} \vspace{-1.5em}
 \begin{center}
   \normalsize
   \renewcommand{\arraystretch}{1.15}
@@ -113,7 +112,7 @@
       & & \textit{Oil Slick} & 0.6789 & \textbf{0.8897} & \textbf{0.7701} & 145 \\
     \bottomrule
   \end{tabular*}
-  \captionof{table}{Evaluation results on the test sets across both geographic and random splits for each model. The best results for each class (\textit{No Slick}, \textit{Oil Slick}) are highlighted in bold (per metric).}
+  \captionof{table}{Evaluation results on the test sets across both geographic \& random splits for each model. The best results for each class (\textit{No Slick}, \textit{Oil Slick}) are highlighted in bold (per metric).}
 \end{center}
 
 \begin{center}
@@ -127,17 +126,20 @@
     \small (c) Baseline CNN: Geographic Split &
     \small (d) Terramind: Geographic Split \\
   \end{tabular}
-  \captionof{figure}{Confusion matrices for the individual test sets across random and geographic splits for each final model.}
+  \captionof{figure}{Confusion matrices for the individual test sets across random \& geographic splits for each final model.}
 \end{center}
 
+\subsection{Example Failure Cases} \vspace{-2.5em}
 \myfigure{0}{../50_evaluation/random\_split/cnn/results/failure\_analysis/false\_negatives/fn\_251.png}{0.75}{}{Example SAR chip from the \textit{Random} test set, classified as \textit{No Slick} by the CNN baseline, which is a \textbf{False Negative (FN)}.}
+
+\vspace{1em}
 
 \myfigure{0}{../50\_evaluation/geographic\_split/gfm/results/failure\_analysis/false\_positives/fp_18.png}{0.75}{}{Example SAR chip from the \textit{Geographic} test set, classified as \textit{Slick} by the Terramind model, which is a \textbf{False Positive (FP)}.}
 
 \section{Conclusion \& Future Work}
 \begin{itemize}
-  \item Answering RQs
-  \item Where we had issues
+  \item Answering RQs \vspace{1em}
+  \item Where we had issues \vspace{1em}
   \item Which aspects useful for future work
 \end{itemize}
 
