@@ -23,12 +23,14 @@ The experiments follow a systematic grid search over hyperparameters for both mo
 ### Model Configurations
 
 **BaselineCNN (CNN)**
+
 - Small 2-layer convolutional network trained from scratch
 - Input: 2-channel SAR images (VV + VH), resized to 224×224
 - Output: Binary classification (oil slick / no slick)
 - Kaiming weight initialization
 
 **TerraMindClassifier (GFM)**
+
 - Pre-trained TerraMind v1 Small backbone (frozen by default)
 - Modality: Sentinel-1 GRD (S1GRD)
 - Custom 2-layer classification head with dropout
@@ -70,6 +72,7 @@ The experiments follow a systematic grid search over hyperparameters for both mo
 ### 2. SAR-Specific Normalization
 
 Custom `SARzScore` transform applies:
+
 - **Nodata masking**: Pixels ≤ −50 dB or NaN are set to 0
 - **Percentile clipping**: Valid pixels clipped to 2nd–98th percentile
 - **Z-score normalization**: (x − mean) / (std + 1e−6)
@@ -78,6 +81,7 @@ Custom `SARzScore` transform applies:
 ### 3. Data Augmentation (Training Only)
 
 Applied during training for BaselineCNN and TerraMindClassifier:
+
 - Random horizontal flip (p=0.5)
 - Random vertical flip (p=0.5)
 - Random 90° rotations (0°, 90°, 180°, 270°)
@@ -117,6 +121,7 @@ Validation and test sets use only normalization (no augmentation).
 ### MLflow Logging
 
 All runs logged to `logs/mlflow/` with:
+
 - Parameters: model, split, LR, weight decay, batch size, warmup, epochs, criterion, device
 - Metrics per epoch: train/val loss, learning rate, accuracy, precision, recall, F1, AUC-ROC
 - Artifacts: best and final model checkpoints
@@ -149,6 +154,10 @@ Each command above performs grid search over the hyperparameter combinations def
 
 ### Evaluation & Analysis
 
+By running [`eval.py`](./eval.py), the best 4 models (one per training configuration) are firstly obtained by selecting the checkpoint with the lowest validation loss. The script then evaluates these models on the designated test set, computing metrics and generating visualizations.
+
+Afterwards, the [`failure_analysis.py`](./failure_analysis.py) script can be run to explicitly visualize false positives and false negatives, providing insight into model performance and potential areas for improvement.
+
 ```bash
 # Evaluate best checkpoint per (model, split) configuration on test set
 python eval.py
@@ -164,7 +173,7 @@ python eval.py
 python failure_analysis.py
 
 # Outputs:
-# - Visualized FP/FN examples with VV and VH channels
+# - Visualized FP/FN examples with both VV and VH channels
 # - Saved to ../50_evaluation/
 ```
 
@@ -231,6 +240,7 @@ After complete training and evaluation:
 ### Metrics Computed
 
 For each model on the test set:
+
 - **Accuracy**: Overall correctness
 - **Precision**: Positive prediction accuracy (minimize false alarms)
 - **Recall**: True positive rate (minimize missed detections)
@@ -241,6 +251,7 @@ For each model on the test set:
 ### Failure Analysis
 
 For each configuration, false positives and false negatives are visualized to identify:
+
 - Misclassified ambiguous regions
 - Model-specific weaknesses
 - Potential dataset annotation issues
