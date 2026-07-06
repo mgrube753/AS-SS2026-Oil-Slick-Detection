@@ -30,5 +30,7 @@ A comprehensive evaluation module for the 4 best-performing models (BaselineCNN 
 
 ## Dependencies
 
-* **Internal:** `config` (Config class), `model` (BaselineCNN, TerraMindClassifier), `dataloader` (get_test_loader)
-* **External:** `torch`, `sklearn.metrics` (accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix, ConfusionMatrixDisplay, classification_report), `matplotlib.pyplot`
+* **Internal:** `config`, `model`, `dataloader`
+* **External:** `torch`,
+*               `sklearn.metrics`
+*               `matplotlib.pyplot`
