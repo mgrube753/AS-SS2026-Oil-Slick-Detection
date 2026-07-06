@@ -31,6 +31,4 @@ A comprehensive evaluation module for the 4 best-performing models (BaselineCNN 
 ## Dependencies
 
 * **Internal:** `config`, `model`, `dataloader`
-* **External:** `torch`,
-                `sklearn.metrics`
-                `matplotlib.pyplot`
+* **External:** `torch`, `sklearn.metrics`, `matplotlib.pyplot`
