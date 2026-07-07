@@ -119,27 +119,27 @@ Version control is maintained through GitHub\footnote{\url{https://github.com/mg
 \subsubsection{How is the source of the model documented (history, reuse of prior models, data sources)?} The baseline model is solely hand-crafted and trained from scratch on the provided dataset using torch\,/\,torchvision. Terramind is a pre-trained GFM loaded from the TerraTorch library, and fine-tuned on the same dataset. The Sentinel-1 SAR data subset from OilSlick is sourced from the WaterBench dataset, which is openly available on Hugging Face, as stated in Section \ref{sec:data}.
 \subsubsection{How are all contributors acknowledged or credited (e.g., CRediT taxonomy)?} The contributors are listed as authors in the ODE document. The contributions are distributed as follows:\subsection*{Malte}
 \begin{itemize}
-    \item Contributed to exploratory data analysis (\texttt{oilslick\_eda.ipynb}) with Vishnu, including value range analysis and band statistics.
-    \item Designed the initial project structure and coordinated task management.
-    \item Developed \texttt{dataset.py} and contributed to \texttt{dataloader.py} with Suma.
-    \item Implemented z-score normalization and percentile clipping in the notebook and data loader.
-    \item Implemented filtered metadata and normalization statistics generation, integrated the Baseline CNN and TerraMind models into the training pipeline, and added MLflow experiment logging.
+    \item Contributed to the exploratory data analysis notebook (see \texttt{oilslick\_eda.ipynb}), primarily with Vishnu.
+    \item Designed the initial project structure and coordinated task management across the project timeline.
+    \item Developed \texttt{dataset.py}, and contributed to \texttt{dataloader.py} with Suma together.
+    \item Implemented z-score normalization and percentile clipping in the notebook and dataloader script.
+    \item Implemented filtered metadata and normalization statistics generation, integrated the Baseline CNN and TerraMind models into the training pipeline (includin train and runner scripts) to ensure proper usage, and added MLflow logging.
 \end{itemize}
 \subsection*{Suma}
 \begin{itemize}
-    \item Documented the \texttt{30\_experiments} module, covering the training pipeline, execution, evaluation, and failure analysis.
-    \item Designed the scientific poster, refined the layout,technical content and formatted to comply academic presentation standards.
+    \item Documented the \texttt{30\_experiments/} modules, covering the training pipeline, execution, evaluation, and failure analysis.
+    \item Designed the scientific poster, refined the layout and technical content to comply academic presentation standards.
     \item Implemented preprocessing and augmentation transforms in \texttt{dataloader.py} for all data splits.
-    \item Contributed to the implementation of filtered metadata and normalization statistics.
+    \item Contributed to the implementation of filtered metadata and normalization statistics with Malte.
     \item Involved in discussions on the experimental workflow, documentation, and preprocessing pipeline.
 \end{itemize}
 \subsection*{Vishnu}
 \begin{itemize}
-    \item Contributed to exploratory data analysis with Malte.
-    \item Implemented $90^\circ$ rotation augmentation in the data loading pipeline.
+    \item Contributed to exploratory data analysis with Malte, primarily focusing on value range analysis and band statistics.
+    \item Implemented $90^\circ$ rotation augmentation in the dataloader.
     \item Developed the Baseline CNN, implemented weight initialization, and developed \texttt{eval.py} and \texttt{failure\_analysis.py}.
-    \item Contributed to metadata filtering and normalization statistics.
-    \item Implemented early stopping, checkpointing, and MLflow-based model selection.
+    \item Contributed to saving of filtered metadata and normalization statistics by fixing a notebook issue of the group.
+    \item Implemented early stopping, checkpointing, and MLflow-based model selection for final evaluation.
 \end{itemize}
 \subsection*{Joint Contributions}
 \begin{itemize}
