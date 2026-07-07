@@ -1,0 +1,81 @@
+# [runner.py](../30_experiments/runner.py)
+
+Argparse-based runner script to execute training with different models and split type combinations for grid search over hyperparameters.
+
+## Overview
+
+A command-line interface for launching the complete grid search training pipeline. Manages 4 training configurations (2 model types × 2 split types) and orchestrates parallel execution of 9 hyperparameter subruns per configuration (3 learning rates × 3 weight decays). Total: 36 trained models.
+
+## Core Functions
+
+* **`main(model_name, split_type)`** Parses command-line arguments and initializes grid search over learning rates and weight decays for the specified model and split type. Iterates through all hyperparameter combinations, calling `run_training()` for each subrun with progress tracking.
+
+## Command-Line Arguments
+
+* **`--model-name`** Model architecture to train. Choices: `["baselinecnn", "terramind"]`. Default: "baselinecnn"
+
+* **`--split-type`** Data split strategy. Choices: `["random", "geographic"]`. Default: "random"
+
+## Hyperparameter Grid
+
+The grid search automatically selects hyperparameters based on model type:
+
+**BaselineCNN (CNN)**
+- Learning Rates: `[1e-4, 5e-4, 1e-3]`
+- Weight Decays: `[1e-4, 1e-3, 1e-2]`
+- Combinations: 3 × 3 = 9 subruns
+
+**TerraMindClassifier (GFM)**
+- Learning Rates: `[5e-4, 1e-3, 3e-3]`
+- Weight Decays: `[1e-5, 1e-4, 1e-3]`
+- Combinations: 3 × 3 = 9 subruns
+
+## Usage Examples
+
+```bash
+# Train BaselineCNN with random split (9 subruns)
+python runner.py --model-name baselinecnn --split-type random
+
+# Train BaselineCNN with geographic split (9 subruns)
+python runner.py --model-name baselinecnn --split-type geographic
+
+# Train TerraMind with random split (9 subruns)
+python runner.py --model-name terramind --split-type random
+
+# Train TerraMind with geographic split (9 subruns)
+python runner.py --model-name terramind --split-type geographic
+```
+
+## Complete Grid Search Execution
+
+To train all 4 model configurations:
+
+```bash
+# Configuration 1: BaselineCNN + Random Split
+python runner.py --model-name baselinecnn --split-type random
+
+# Configuration 2: BaselineCNN + Geographic Split
+python runner.py --model-name baselinecnn --split-type geographic
+
+# Configuration 3: TerraMind + Random Split
+python runner.py --model-name terramind --split-type random
+
+# Configuration 4: TerraMind + Geographic Split
+python runner.py --model-name terramind --split-type geographic
+```
+
+**Total Training:** 4 configurations × 9 subruns = 36 trained models
+
+## Dependencies
+
+* **Internal:** `train`, `config`
+* **External:** `argparse`
+
+## Output
+
+Each subrun generates:
+- **Checkpoints**: Saved to `logs/<split_folder>/<model_folder>/models/lr<LR>_wd<WD>/`
+- **MLflow Logs**: Tracked in `logs/mlflow/` with experiment names `{model_name}-{split_type}`
+- **Console Output**: Progress tracking with epoch metrics and loss values
+
+All best models are later retrieved by `eval.py` for test set evaluation based on lowest validation loss.
