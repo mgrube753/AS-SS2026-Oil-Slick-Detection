@@ -117,7 +117,35 @@ Version control is maintained through GitHub\footnote{\url{https://github.com/mg
 \subsubsection{How are they made Interoperable? (Community standards, open formats)} Python and Jupyter notebooks are the core of the project. PyTorch model training checkpoints in the .pt format are saved for reuse. Results are saved as CSV files to enable easy analysis.
 \subsubsection{How are they made reusable? (Documentation, licensing)}  Documentation and code comments are provided in the GitHub repository to ensure proper understanding and reuse of the code. Since the OilSlick dataset is used for the project, the same CC-BY-4.0 license applies to the code and models.
 \subsubsection{How is the source of the model documented (history, reuse of prior models, data sources)?} The baseline model is solely hand-crafted and trained from scratch on the provided dataset using torch\,/\,torchvision. Terramind is a pre-trained GFM loaded from the TerraTorch library, and fine-tuned on the same dataset. The Sentinel-1 SAR data subset from OilSlick is sourced from the WaterBench dataset, which is openly available on Hugging Face, as stated in Section \ref{sec:data}.
-\subsubsection{How are all contributors acknowledged or credited (e.g., CRediT taxonomy)?} The contributors are listed as authors in the ODE document. The contributions are distributed as follows: ... % todo: add contributions paragraph
+\subsubsection{How are all contributors acknowledged or credited (e.g., CRediT taxonomy)?} The contributors are listed as authors in the ODE document. The contributions are distributed as follows:\subsection*{Malte}
+\begin{itemize}
+    \item Contributed to exploratory data analysis (\texttt{oilslick\_eda.ipynb}) with Vishnu, including value range analysis and band statistics.
+    \item Designed the initial project structure and coordinated task management.
+    \item Developed \texttt{dataset.py} and contributed to \texttt{dataloader.py} with Suma.
+    \item Implemented z-score normalization and percentile clipping in the notebook and data loader.
+    \item Implemented filtered metadata and normalization statistics generation, integrated the Baseline CNN and TerraMind models into the training pipeline, and added MLflow experiment logging.
+\end{itemize}
+\subsection*{Suma}
+\begin{itemize}
+    \item Documented the \texttt{30\_experiments} module, covering the training pipeline, execution, evaluation, and failure analysis.
+    \item Designed and created the scientific poster, iteratively refining the layout, technical content, and formatting to comply with project and academic presentation standards.
+    \item Implemented preprocessing and augmentation transforms in \texttt{dataloader.py} for all data splits.
+    \item Contributed to the implementation of filtered metadata and normalization statistics.
+    \item Involved in discussions on the experimental workflow, documentation, and preprocessing pipeline.
+\end{itemize}
+\subsection*{Vishnu}
+\begin{itemize}
+    \item Contributed to exploratory data analysis with Malte.
+    \item Implemented $90^\circ$ rotation augmentation in the data loading pipeline.
+    \item Developed the Baseline CNN, implemented weight initialization, and developed \texttt{eval.py} and \texttt{failure\_analysis.py}.
+    \item Contributed to metadata filtering and normalization statistics.
+    \item Implemented early stopping, checkpointing, and MLflow-based model selection.
+\end{itemize}
+\subsection*{Joint Contributions}
+\begin{itemize}
+    \item Designed the experimental directory structure.
+    \item Collaboratively developed the ODE, focusing on data, model selection, and workflow.
+    \item Discussed dataset preparation and limitations of the WaterBench subset and Hugging Face release.
+\end{itemize}
 \subsubsection{Who are the intended audiences, and how was documentation adapted to them?} The primary audience are geospatial AI / ML researchers. To ensure both reproducibility and clarity, the documentation shows explanations of preprocessing, the baseline architecture and modifications regarding the GFM, the training protocols, and evaluation metrics.
-
 \end{document}
