@@ -138,9 +138,10 @@
 
 \section{Conclusion \& Future Work}
 \begin{itemize}
-  \item Answering RQs \vspace{1em}
-  \item Where we had issues \vspace{1em}
-  \item Which aspects useful for future work
+  \item \textbf{RQ1:} Oil Slick F1 score $\sim$0.71--0.77 $\mid$ only mild OOD drop ($\sim$0.03 F1) \vspace{.25em} % surprisingly robust across regions (see F1 score column for Oil Slick (geo cnn vs random cnn / geo gfm vs random gfm))
+  \item \textbf{RQ2:} GFM $\to$ higher Slick F1 ($\uparrow$ 0.03) $\mid$ lower No-Slick F1 ($\downarrow$ 0.07) \\$\to$ no clear improvement over CNN; XAI not applied (time) \vspace{.25em}
+  \item \textbf{Limitations:} All models trade precision for recall (Slick) $\to$ false alarms on lookalikes as key failure mode $\mid$ Dataset quality (invalid samples) \vspace{.25em} % even after filtering <= -50db imagery / >= 40% nodata / std=0.0 imagery (corrupt)
+  \item \textbf{Future Work:} XAI-driven failure analysis to understand model behavior on lookalikes $\mid$ Larger SAR datasets with less invalid samples
 \end{itemize}
 
 \printbibliography
