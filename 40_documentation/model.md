@@ -133,30 +133,3 @@ Both models use **BCEWithLogitsLoss** (Binary Cross-Entropy with Logits):
 
 * **Internal:** `terratorch.registry` (for TerraMindClassifier only)
 * **External:** `torch`, `torch.nn`
-
-## Usage Example
-
-```python
-from model import BaselineCNN, TerraMindClassifier
-
-# Create BaselineCNN
-cnn_model = BaselineCNN(num_classes=2, in_channels=2)
-
-# Create TerraMindClassifier
-gfm_model = TerraMindClassifier(num_classes=2, freeze_backbone=True)
-
-# Forward pass
-x = torch.randn(16, 2, 224, 224)
-cnn_out = cnn_model(x)  # [16, 1]
-gfm_out = gfm_model(x)  # [16, 1]
-
-# Apply sigmoid for probability
-probs = torch.sigmoid(cnn_out)  # [16, 1]
-```
-
-## Training Notes
-
-- **Output scaling**: Single logit output requires sigmoid activation for probabilities
-- **Threshold**: Default 0.5 for binary classification
-- **Initialization**: Critical for CNN training; pre-training mitigates for GFM
-- **Regularization**: Dropout (p=0.3) in both architectures prevents overfitting
