@@ -114,35 +114,6 @@ A comprehensive data loading module that orchestrates the complete data pipeline
 * **Internal:** `dataset`, `config`
 * **External:** `torch`, `torchvision.transforms`, `numpy`, `json`, `os`
 
-## Usage Example
-
-```python
-from dataloader import get_train_val_loaders, get_test_loader
-from config import Config
-
-# Create training and validation loaders
-train_loader, val_loader, train_ds = get_train_val_loaders(
-    data_root=Config.DATA_ROOT,
-    batch_size=Config.BATCH_SIZE,
-    split_type="random",
-    seed=Config.SEED
-)
-
-# Create test loader
-test_loader, test_ds = get_test_loader(
-    data_root=Config.DATA_ROOT,
-    batch_size=Config.BATCH_SIZE,
-    split_type="random",
-    seed=Config.SEED
-)
-
-# Iterate through batches
-for images, labels in train_loader:
-    # images: [16, 2, 224, 224]
-    # labels: [16]
-    pass
-```
-
 ## Key Features
 
 - **SAR-specific preprocessing**: Handles Sentinel-1 characteristics (dB scale, speckle)
