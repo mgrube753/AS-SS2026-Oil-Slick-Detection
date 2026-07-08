@@ -4,11 +4,11 @@ Argparse-based runner script to execute training with different models and split
 
 ## Overview
 
-A command-line interface for launching the complete grid search training pipeline. Manages 4 training configurations (2 model types × 2 split types) and orchestrates parallel execution of 9 hyperparameter subruns per configuration (3 learning rates × 3 weight decays). Total: 36 trained models.
+A command-line interface for launching the complete grid search training pipeline. Manages 4 training configurations (2 model types × 2 split types) and orchestrates parallel execution of 9 hyperpara[...] 
 
 ## Core Functions
 
-* **`main(model_name, split_type)`** Parses command-line arguments and initializes grid search over learning rates and weight decays for the specified model and split type. Iterates through all hyperparameter combinations, calling `run_training()` for each subrun with progress tracking.
+* **`main(model_name, split_type)`** Parses command-line arguments and initializes grid search over learning rates and weight decays for the specified model and split type. Iterates through all hy[...]
 
 ## Command-Line Arguments
 
@@ -29,22 +29,6 @@ The grid search automatically selects hyperparameters based on model type:
 - Learning Rates: `[5e-4, 1e-3, 3e-3]`
 - Weight Decays: `[1e-5, 1e-4, 1e-3]`
 - Combinations: 3 × 3 = 9 subruns
-
-## Usage Examples
-
-```bash
-# Train BaselineCNN with random split (9 subruns)
-python runner.py --model-name baselinecnn --split-type random
-
-# Train BaselineCNN with geographic split (9 subruns)
-python runner.py --model-name baselinecnn --split-type geographic
-
-# Train TerraMind with random split (9 subruns)
-python runner.py --model-name terramind --split-type random
-
-# Train TerraMind with geographic split (9 subruns)
-python runner.py --model-name terramind --split-type geographic
-```
 
 ## Complete Grid Search Execution
 
