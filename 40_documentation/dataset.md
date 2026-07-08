@@ -107,36 +107,6 @@ A custom PyTorch `Dataset` subclass for the oil slick detection task. Manages:
 * **Internal:** Metadata from `../20_data_analysis/filtered_metadata.csv`
 * **External:** `torch`, `torch.utils.data`, `tifffile`, `pandas`, `numpy`, `os`
 
-## Usage Example
-
-```python
-from dataset import OilSlickDataset
-from dataloader import get_train_transform
-
-# Create training dataset with random split
-train_stats = load_split_stats("random")
-transform = get_train_transform(train_stats)
-train_ds = OilSlickDataset(
-    data_root="../10_waterbench_data/data/OilSlick",
-    split_type="random",
-    split="train",
-    transform=transform
-)
-
-# Access a single sample
-image, label = train_ds[0]
-# image shape: [2, 224, 224] (after transform)
-# label: tensor(0 or 1)
-```
-
-## Key Features
-
-- **Proper dimension handling**: Ensures 3D tensor output [C, H, W]
-- **Metadata filtering**: Only uses valid samples marked in filtered metadata
-- **Transform flexibility**: Supports custom preprocessing pipelines
-- **SAR-specific**: Designed for Sentinel-1 dual-polarization data
-- **Label mapping**: Converts sample IDs to binary oil slick presence
-
 ## Notes
 
 - Images with missing metadata or file paths are automatically excluded
