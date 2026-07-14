@@ -1,4 +1,4 @@
-\documentclass[a0, portrait, final]{./unirostock/a0poster}
+\documentclass[a0, landscape, final]{./unirostock/a0poster}
 \usepackage[english]{babel}
 \usepackage{helvet}
 \usepackage{amsmath}
@@ -17,7 +17,7 @@
 
 \usepackage{caption}
 \captionsetup{
-  font=small, 
+  font=normalsize, 
   labelfont=bf, 
   labelsep=period,
   figurename=Fig.,
@@ -29,10 +29,9 @@
 \usepackage{caption}
 
 \title{Oil Slick Detection in Sentinel-1 Data}
-\subtitle{Using a CNN Baseline \& the Geospatial Foundation Model Terramind}
+\subtitle{\,Using a CNN Baseline \& the Geospatial Foundation Model Terramind}
 
-%\columncount{2} % Spaltenzahl im Fliesstext kann eingestellt werden - wird sonst auch automatisch vorbelegt:
-                 % 2 in Hochformat, 4 in Querformat
+\columncount{3} % Spaltenzahl im Fliesstext
 
 \addcontributor{Malte Grube}{}
 \addcontributor{Suma Gonuguntla}{}
@@ -40,9 +39,9 @@
 
 \addinstitute{\hspace{-.2em}}{Institute of Computer Science}{}{}{University of Rostock}{A-Einstein-Str. 22}{Rostock}{Germany}
 
-\renewcommand{\mylogo}{\includegraphics[width=140mm]{IFI.png}}
+% \renewcommand{\mylogo}{\includegraphics[width=110mm]{IFI.png}}
 
-\AtBeginBibliography{\small}
+\AtBeginBibliography{\normalsize}
 
 \begin{document} 
 
@@ -53,22 +52,25 @@
 
 \nocite{11445875}
 
+\linespread{1.15}
+
 \section{Introduction} \vspace{-1em}
-\subsection{Project Motivation} \vspace{-2em}
+\subsection{Project Motivation} \vspace{-1.5em}
 
 \begin{itemize}
   \item \textbf{Oil slicks} $\to$ severe damage \& hard to monitor manually
   \item \textbf{Sentinel-1 SAR imagery} $\to$ day / night / all-weather monitoring possible
   \item \textbf{Short surface waves} $\to$ slicks as dark patches in SAR imagery
 \end{itemize}
+\vspace{.5em}
+\subsection{Research Questions} \vspace{-1.5em}
+\begin{itemize}
+  \item \textbf{RQ1:} How well can deep learning detect oil slicks in \textit{Sentinel-1 SAR imagery}, and how does performance change between an in-distribution random split and a geographic out-of-distribution split (\textit{Mediterranean})?
+  \item \textbf{RQ2:} Can a \textit{Geospatial Foundation Model} improve over a CNN baseline, and what do XAI methods reveal about the features that drive the predictions?
+\end{itemize}
 
-\subsection{Research Questions} \vspace{-2em}
-
-  \textbf{RQ1:} How well can deep learning detect oil slicks in Sentinel-1 SAR imagery, and how does performance change between an in-distribution random split and a geographic out-of-distribution split (Mediterranean)? \vspace{1em} \\
-  \textbf{RQ2:} Can a Geospatial Foundation Model improve over a CNN baseline, and what do XAI methods reveal about the features that drive the predictions?
-
-\section{Methodology}
-\subsection{Experimental Setup} \vspace{-2em}
+\section{Methodology} \vspace{.5em}
+\subsection{Experimental Setup} \vspace{-1.5em}
 \begin{itemize}
   \item \textbf{CNN baseline} $\to$ trained from scratch on OilSlick
   \item \textbf{Terramind} \cite{11445875} $\to$ frozen backbone, only training a classification head
@@ -76,8 +78,8 @@
   \item \textbf{Find best configuration} $\to$ based on val loss for each model \& split
   \item \textbf{Final evaluation} $\to$ 4 final models $\to$ individual test set
 \end{itemize}
-
-\subsection{Crucial Steps before Training} \vspace{-2em}
+\vspace{.85em}
+\subsection{Crucial Steps before Training} \vspace{-1.5em}
 \begin{itemize}
   \item \textbf{Data analysis} $\to$ understand data distributions \& apply imagery filtering
   \item \textbf{Data filtering} $\to$ find corrupt TIFF files \& imagery with >= 40\% of nodata
@@ -85,64 +87,67 @@
 
 \myfigure{0}{filtering.png}{0.95}{}{Filtering of OilSlick's Sentinel-1 data subset. The blue bars represent the number of images before filtering, while the orange bars represent the number of images after filtering.}
 
+\columnbreak
 \section{Results}
-\subsection{Test Set-based Evaluation} \vspace{-1.5em}
-\begin{center}
-  \normalsize
-  \renewcommand{\arraystretch}{1.15}
-  \begin{tabular*}{.95\linewidth}{@{\extracolsep{\fill}} l l c c c c c @{}}
-    \toprule
-    \textbf{Split} & \textbf{Model} & \textbf{Class} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} & \textbf{n} \\
-    \midrule
-    \multirow{2}{*}{Geographic}
-      & \multirow{2}{*}{CNN}
-      & No Slick & 0.7925 & 0.5600 & 0.6562 & 75 \\
-      & & \textit{Oil Slick} & 0.6250 & 0.8333 & 0.7143 & 66 \\[5pt]
-    \multirow{2}{*}{Geographic}
-      & \multirow{2}{*}{GFM}
-      & No Slick & \textbf{0.8333} & 0.5333 & 0.6504 & 75 \\
-      & & \textit{Oil Slick} & 0.6237 & 0.8788 & 0.7296 & 66 \\[5pt]
-    \multirow{2}{*}{Random}
-      & \multirow{2}{*}{CNN}
-      & No Slick & 0.6957 & \textbf{0.6612} & \textbf{0.6780} & 121 \\
-      & & \textit{Oil Slick} & \textbf{0.7285} & 0.7586 & 0.7432 & 145 \\[5pt]
-    \multirow{2}{*}{Random}
-      & \multirow{2}{*}{GFM}
-      & No Slick & 0.7895 & 0.4959 & 0.6091 & 121 \\
-      & & \textit{Oil Slick} & 0.6789 & \textbf{0.8897} & \textbf{0.7701} & 145 \\
-    \bottomrule
-  \end{tabular*}
-  \captionof{table}{Evaluation results on the test sets across both geographic \& random splits for each model. The best results for each class (\textit{No Slick}, \textit{Oil Slick}) are highlighted in bold (per metric).}
-\end{center}
+\myfigure{0}{./val_loss_gfm_random.png}{0.99}{}{Illustration of the grid search wrt.\,validation loss curves for the \textbf{Terramind} model on the \textit{Random} split -- to further find the best configuration based on the lowest validation loss.}
+% \begin{center}
+%   \normalsize
+%   \renewcommand{\arraystretch}{1.15}
+%   \begin{tabular*}{.95\linewidth}{@{\extracolsep{\fill}} l l c c c c c @{}}
+%     \toprule
+%     \textbf{Split} & \textbf{Model} & \textbf{Class} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} & \textbf{n} \\
+%     \midrule
+%     \multirow{2}{*}{Geographic}
+%       & \multirow{2}{*}{CNN}
+%       & No Slick & 0.7925 & 0.5600 & 0.6562 & 75 \\
+%       & & \textit{Oil Slick} & 0.6250 & 0.8333 & 0.7143 & 66 \\[5pt]
+%     \multirow{2}{*}{Geographic}
+%       & \multirow{2}{*}{GFM}
+%       & No Slick & \textbf{0.8333} & 0.5333 & 0.6504 & 75 \\
+%       & & \textit{Oil Slick} & 0.6237 & 0.8788 & 0.7296 & 66 \\[5pt]
+%     \multirow{2}{*}{Random}
+%       & \multirow{2}{*}{CNN}
+%       & No Slick & 0.6957 & \textbf{0.6612} & \textbf{0.6780} & 121 \\
+%       & & \textit{Oil Slick} & \textbf{0.7285} & 0.7586 & 0.7432 & 145 \\[5pt]
+%     \multirow{2}{*}{Random}
+%       & \multirow{2}{*}{GFM}
+%       & No Slick & 0.7895 & 0.4959 & 0.6091 & 121 \\
+%       & & \textit{Oil Slick} & 0.6789 & \textbf{0.8897} & \textbf{0.7701} & 145 \\
+%     \bottomrule
+%   \end{tabular*}
+%   \captionof{table}{Evaluation results on the test sets across both geographic \& random splits for each model. The best results for each class (\textit{No Slick}, \textit{Oil Slick}) are highlighted in bold (per metric).}
+% \end{center}
 
+\subsection{Test Set-based Evaluation} \vspace{-1em}
 \begin{center}
   \begin{tabular}{cc}
-    \includegraphics[width=0.40\linewidth]{../50_evaluation/random\_split/cnn/results/confusion_matrix.png} &
-    \includegraphics[width=0.40\linewidth]{../50_evaluation/random\_split/gfm/results/confusion_matrix.png} \\
-    \small (a) Baseline CNN: Random Split &
-    \small (b) Terramind: Random Split \\
-    \includegraphics[width=0.40\linewidth]{../50_evaluation/geographic\_split/cnn/results/confusion_matrix.png} &
-    \includegraphics[width=0.40\linewidth]{../50_evaluation/geographic\_split/gfm/results/confusion_matrix.png} \\
-    \small (c) Baseline CNN: Geographic Split &
-    \small (d) Terramind: Geographic Split \\
+    \includegraphics[width=0.49\linewidth]{../50_evaluation/random\_split/cnn/results/confusion_matrix.png} &
+    \includegraphics[width=0.49\linewidth]{../50_evaluation/random\_split/gfm/results/confusion_matrix.png} \\
+    \normalsize (a) Baseline CNN: Random Split &
+    \normalsize (b) Terramind: Random Split \\
+    \includegraphics[width=0.49\linewidth]{../50_evaluation/geographic\_split/cnn/results/confusion_matrix.png} &
+    \includegraphics[width=0.49\linewidth]{../50_evaluation/geographic\_split/gfm/results/confusion_matrix.png} \\
+    \normalsize (c) Baseline CNN: Geographic Split &
+    \normalsize (d) Terramind: Geographic Split \\
   \end{tabular}
-  \captionof{figure}{Confusion matrices for the individual test sets across random \& geographic splits for each final model.}
+  \captionof{figure}{Confusion matrices for the individual test sets across random \& geographic splits for each final model -- obtained from the 4 grid search runs.}
 \end{center}
 
-\subsection{Example Failure Cases} \vspace{-2.5em}
-\myfigure{0}{../50_evaluation/random\_split/cnn/results/failure\_analysis/false\_negatives/fn\_251.png}{0.75}{}{Example SAR chip from the \textit{Random} test set, classified as \textit{No Slick} by the CNN baseline, which is a \textbf{False Negative (FN)}.}
+\columnbreak
 
-\vspace{1em}
+\subsection{Example Failure Cases} \vspace{-1em}
 
-\myfigure{0}{../50\_evaluation/geographic\_split/gfm/results/failure\_analysis/false\_positives/fp_18.png}{0.75}{}{Example SAR chip from the \textit{Geographic} test set, classified as \textit{Slick} by the Terramind model, which is a \textbf{False Positive (FP)}.}
+\myfigure{0}{../50_evaluation/random\_split/cnn/results/failure\_analysis/false\_negatives/fn\_251.png}{0.77}{}{Example SAR chip from the \textit{Random} test set, classified as \textit{No Slick} by the CNN baseline, which is a \textbf{False Negative (FN)}.} \vspace{-.3em}
+
+\myfigure{0}{../50\_evaluation/geographic\_split/gfm/results/failure\_analysis/false\_positives/fp_18.png}{0.77}{}{Example SAR chip from the \textit{Geographic} test set, classified as \textit{Slick} by the Terramind model, which is a \textbf{False Positive (FP)}.}
 
 \section{Conclusion \& Future Work}
 \begin{itemize}
-  \item \textbf{RQ1:} Oil Slick F1 score $\sim$0.71--0.77 $\mid$ only mild OOD drop ($\sim$0.03--0.04) \vspace{.25em} % surprisingly robust across regions (see F1 score column for Oil Slick (geo cnn vs random cnn / geo gfm vs random gfm)). so, ML/DL can be used to detect oil slicks in SAR imagery across several regions
-  \item \textbf{RQ2:} GFM $\to$ higher Slick F1 ($\uparrow$ 0.03) $\mid$ lower No-Slick F1 ($\downarrow$ 0.07) \\$\to$ no clear improvement over CNN; XAI not applied (time) \vspace{.25em} % see GFM random and CNN random; GFM geo and CNN geo even differ less
+  \item \textbf{RQ1:} Oil Slick F1 scores $\sim$\textbf{0.71--0.77}, only mild OOD drop ($\sim$\textbf{0.03--0.04}) \vspace{.3em} % surprisingly robust across regions (see F1 score column for Oil Slick (geo cnn vs random cnn / geo gfm vs random gfm)). so, ML/DL can be used to detect oil slicks in SAR imagery across several regions
+  \item \textbf{RQ2:} GFM $\to$ higher Slick F1 ($\uparrow$ \textbf{0.03}), lower No-Slick F1 ($\downarrow$ \textbf{0.07}) \vspace{.2em}\\$\to$ \textit{no clear improvement over CNN} $\mid$ XAI not applied (time) \vspace{.3em} % see GFM random and CNN random; GFM geo and CNN geo even differ less
   \item \textbf{Limitations:} All models trade precision for recall (Oil Slick) % recall > precision for each config; random CNN is more balanced and shows highest Slick precision with 0.7285, but lowest Slick recall with 0.7586 --> F1=0.7432
-   $\to$ false alarms on lookalikes as key failure mode $\mid$ Dataset quality (invalid samples) \vspace{.25em} % even after filtering <= -50db imagery / >= 40% nodata / std=0.0 imagery (corrupt)
-  \item \textbf{Future Work:} XAI-driven failure analysis to understand model behavior on lookalikes $\mid$ Larger SAR datasets with less invalid samples % since we are no domain-specific experts, we cannot tell why invalid samples still remain in the dataset after filtering
+   $\to$ \textit{False alarms} on lookalikes as key failure mode $\mid$ Dataset quality \textit{(invalid samples)} \vspace{.3em} % even after filtering <= -50db imagery / >= 40% nodata / std=0.0 imagery (corrupt)
+  \item \textbf{Future Work:} XAI-driven failure analysis to \textit{interpret} model behavior on lookalikes, and experimenting on (larger) SAR datasets with less invalid samples % since we are no domain-specific experts, we cannot tell why invalid samples still remain in the dataset after filtering
 \end{itemize}
 
 \printbibliography

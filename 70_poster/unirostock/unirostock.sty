@@ -49,21 +49,23 @@
 
 % Randeinstellungen etc
 % ...existing code...
-\setlength{\voffset}{16.6mm}
-\setlength{\hoffset}{33.6mm}
-\textwidth=\paperwidth \advance\textwidth by -118mm % links und rechts je 59mm Rand
+\setlength{\voffset}{10mm}
+\setlength{\hoffset}{10mm}
+\textwidth=\paperwidth \advance\textwidth by -70mm
 \newlength{\minip@gewidth}
-\minip@gewidth=\textwidth \advance\minip@gewidth by -106.5mm
-\textheight=\paperheight \advance\textheight by -39mm   % <--- hier anpassen (höher/kleiner machen)
-\newlength{\f@@tboxtop}    \f@@tboxtop=\paperheight \advance\f@@tboxtop by -305mm  % Fußbereich oben
-\newlength{\f@@tboxbottom} \f@@tboxbottom=\paperheight \advance\f@@tboxbottom by -208mm % Fußbereich unten
+\minip@gewidth=\textwidth \advance\minip@gewidth by -30mm
+\textheight=\paperheight \advance\textheight by -15mm
+\newlength{\f@@tboxtop}    \f@@tboxtop=\paperheight \advance\f@@tboxtop by -157mm
+\newlength{\f@@tboxbottom} \f@@tboxbottom=\paperheight \advance\f@@tboxbottom by -60mm
+\newlength{\f@@tbarcenter}
+\setlength{\f@@tbarcenter}{-0.5\dimexpr\f@@tboxtop+\f@@tboxbottom\relax}
 % ...existing code...
 % Breite der unteren Box
 \newlength{\fr@mewidth} \fr@mewidth=\textwidth \advance\fr@mewidth by -4.55pt
-\setlength{\columnsep}{15mm}          % Spaltenabstand in multicols-Umgebung
+\setlength{\columnsep}{14mm}          % Spaltenabstand
 \setlength{\columnseprule}{0pt}       % Strichdicke zwischen den Spalten
 % Breite fuer weiteren Logobereich im Header
-\newlength{\l@gowidth} \l@gowidth=\fr@mewidth \advance\l@gowidth by -420mm \advance\l@gowidth by -4.55pt
+\newlength{\l@gowidth} \l@gowidth=\fr@mewidth \advance\l@gowidth by -360mm \advance\l@gowidth by -4.55pt
 
 %%%%%%%% Grundkommandos %%%%%%%%%%%%%%%%%
 % eigenes Logo
@@ -78,23 +80,23 @@
 \WithSuffix\def\section*#1{\postersection{#1}}
 \def\postersection#1{\setlength{\secb@xwidth}{\linewidth}
                \advance\secb@xwidth by -\columnsep
-               \vspace{28.35pt}\hfil\begin{tikzpicture}
+               \vspace{18pt}\hfil\begin{tikzpicture}
                                       \color{colorscheme}
-                                      \draw (0, 0) node[color=colorscheme, fill=colorscheme, rounded corners=6.25mm]
+                                      \draw (0, 0) node[color=colorscheme, fill=colorscheme, rounded corners=5mm]
                                             {
-                                            \vspace*{0.3em}
+                                            \vspace*{0.2em}
                                             \begin{minipage}[t][][t]{\secb@xwidth}
                                               \begin{center}
-                                                 \textcolor{white}{\arialnarrow{45}{60}{#1}}
+                                                 \textcolor{white}{\arialnarrow{40}{50}{#1}}
                                               \end{center}
                                             \end{minipage}
-                                            \vspace*{0.3em}
+                                            \vspace*{0.2em}
                                             };
                                    \end{tikzpicture}
                               \hfil\nobreak\par}
 
 % Fliesstextueberschrift
-\def\subsection#1{\vspace{28.35pt}\arialnarrow{25}{28.35}{\bf #1}\nobreak\\[28.35pt]}
+\def\subsection#1{\vspace{14pt}\arialnarrow{26}{26}{\bf #1}\nobreak\\[12pt]}
 
 % Standardspaltenzahl
 \newcount\c@lumncount
@@ -106,38 +108,24 @@
 % \addcontributor{Er}{a} zum Hinzufuegen eines Wissenschaftlers zur Fusszeile
 
 \def\addcontributor#1#2{\@ifundefined{c@ntributors}{%
-    \def\c@ntributors{#1\raisebox{12pt}{\arialnarrow{40}{30}{\hspace*{8pt}#2}}}}{%
-    \g@addto@macro\c@ntributors{,\ #1\raisebox{12pt}{\arialnarrow{40}{30}{\hspace*{8pt}#2}}}}}
+    \def\c@ntributors{#1\raisebox{10pt}{\arialnarrow{30}{24}{\hspace*{6pt}#2}}}}{%
+    \g@addto@macro\c@ntributors{,\ #1\raisebox{10pt}{\arialnarrow{30}{24}{\hspace*{6pt}#2}}}}}
 
 
 % \addinstitute{a}{Institut}{Lehrstuhl}{Fachbereich}{Universit\"at Rostock}{Musterstra{\ss}e 00}{18055 Rostock}{Germany} dito
 \def\Institutet@ble{}
 \def\addinstitute#1#2#3#4#5#6#7#8{\g@addto@macro\Institutet@ble{%
-\raisebox{12pt}{\arialnarrow{40}{30}{#1\hspace*{8pt}}} &%
-\edef\@temp{#2}\ifx\@temp\@empty{}\else\verd{40}{50}{\MakeUppercase{#2}}\@sep\fi%
-\edef\@temp{#3}\ifx\@temp\@empty{}\else\verd{40}{50}{\MakeUppercase{#3}}\@sep\fi%
-\edef\@temp{#4}\ifx\@temp\@empty{}\else\verd{40}{50}{\MakeUppercase{#4}}\@sep\fi%
-\arialnarrow{40}{50}{\bf #5}%
-\edef\@temp{#6}\ifx\@temp\@empty{}\else,\ \arialnarrow{40}{50}{#6}\fi%
-\edef\@temp{#7}\ifx\@temp\@empty{}\else\@sep\arialnarrow{40}{50}{#7}\fi%
-\edef\@temp{#8}\ifx\@temp\@empty{}\else,\ \arialnarrow{40}{50}{#8}\fi\\[-12pt]%
+\raisebox{10pt}{\arialnarrow{30}{24}{#1\hspace*{6pt}}} &%
+\edef\@temp{#2}\ifx\@temp\@empty{}\else\verd{30}{38}{\MakeUppercase{#2}}\@sep\fi%
+\edef\@temp{#3}\ifx\@temp\@empty{}\else\verd{30}{38}{\MakeUppercase{#3}}\@sep\fi%
+\edef\@temp{#4}\ifx\@temp\@empty{}\else\verd{30}{38}{\MakeUppercase{#4}}\@sep\fi%
+\arialnarrow{30}{38}{\bf #5}%
+\edef\@temp{#6}\ifx\@temp\@empty{}\else,\ \arialnarrow{30}{38}{#6}\fi%
+\edef\@temp{#7}\ifx\@temp\@empty{}\else\@sep\arialnarrow{30}{38}{#7}\fi%
+\edef\@temp{#8}\ifx\@temp\@empty{}\else,\ \arialnarrow{30}{38}{#8}\fi\\[-10pt]%
 
                                                                 }}%
-% erstellt die Institutstabelle in der Fusszeile
-\def\m@kefooter{
-  \begin{center}
-    \parbox{\minip@gewidth}{
-      \vbox to 97mm{
-          \vfil
-          \textcolor{white}{
-          \arialnarrow{45}{60}{\bf \c@ntributors\\[20pt]}
-          \setlength{\parskip}{0pt}         % Abstand nach Absatz
-          \begin{tabular}{ll}
-             \Institutet@ble
-          \end{tabular}
-          }\vfil}}
-  \end{center}
-}
+\def\m@kefooter{}
 
 
 
@@ -147,8 +135,8 @@
 \newcommand{\arial}[3]{\fontfamily{phv}\fontseries{m}\fontshape{n}\fontsize{#1}{#2}\selectfont{}#3{}\normalfont}
 \newcommand{\arialnarrow}[3]{\fontfamily{phv}\fontseries{mc}\fontshape{n}\fontsize{#1}{#2}\selectfont{}#3{}\normalfont}
 %
-\newcommand{\titlef@nt}[1]{\textcolor{colorscheme}{\verd{100}{120}{#1}}}
-\newcommand{\subtitlef@nt}[1]{\textcolor{subtitlegray}{\arialnarrow{70}{80}{#1}}}
+\newcommand{\titlef@nt}[1]{\textcolor{colorscheme}{\verd{85}{100}{#1}}}
+\newcommand{\subtitlef@nt}[1]{\textcolor{subtitlegray}{\arialnarrow{55}{65}{#1}}}
 
 
 % globale Schriftart
@@ -156,7 +144,7 @@
 \renewcommand{\familydefault}{phv}
 \renewcommand{\seriesdefault}{m}
 \renewcommand{\shapedefault}{n}
-\fontsize{40}{48.35}
+\fontsize{38}{42}
 % \fontsize{25}{33.35}
 \normalfont
 \selectfont
@@ -167,35 +155,43 @@
   % Koordinaten: links 59mm, oben 49mm
   % Unilogo
   \setlength{\tabcolsep}{0pt}
-  \begin{tabular}{lr}
-  \includegraphics[width=420mm]{./unirostock/UNI-Logo_Siegel_4c_RZ} &
-    \begin{minipage}[b]{\l@gowidth}
-      \raggedleft \mylogo
-    \end{minipage}
-  \end{tabular}\\
+  % \begin{tabular}{lr}
+  % \includegraphics[width=340mm]{./unirostock/UNI-Logo_Siegel_4c_RZ} &
+  %   \begin{minipage}[b]{\l@gowidth}
+  %     \raggedleft \mylogo
+  %   \end{minipage}
+  % \end{tabular}\\
   %
   % Rahmen mit abgerundeten Ecken
-    \rule{0pt}{40mm}
-    \begin{tikzpicture}[baseline=40mm]
-       \draw[rounded corners=12.5mm, line width=4.55pt, color=colorscheme, fill=white] (0mm,40mm) rectangle (\textwidth, -\f@@tboxbottom );
+    \rule{0pt}{12mm}
+    \begin{tikzpicture}[baseline=12mm]
+       \draw[rounded corners=12.5mm, line width=4.55pt, color=colorscheme, fill=white] (0mm,12mm) rectangle (\textwidth, -\f@@tboxbottom );
        \draw[rounded corners=00.0mm, line width=4.55pt, color=colorscheme, fill=colorscheme](0mm, -\f@@tboxtop) rectangle (\textwidth, -\f@@tboxbottom );
+       \node[text=white, align=center, text width=\minip@gewidth, inner sep=0pt]
+            at (0.5\textwidth, \f@@tbarcenter) {%
+              \arialnarrow{38}{48}{\bf\c@ntributors\\[10pt]}
+              \setlength{\parskip}{0pt}%
+              \begin{tabular}{ll}
+                \Institutet@ble
+              \end{tabular}%
+            };
     \end{tikzpicture}
     %
     % Koordinaten: links 59mm, oben 130mm
     \vspace*{-\f@@tboxbottom}
-    \vspace*{-10mm}
+    \vspace*{6mm}
     %
   % Koordinaten: links 59mm, oben 210mm
   \begin{center}
   \begin{minipage}[c]{\minip@gewidth}
   \setlength{\parindent}{0.0mm}         % Absatzeinzug
-  \setlength{\parskip}{8.35pt}         % Abstand nach Absatz
+  \setlength{\parskip}{4pt}         % Abstand nach Absatz
   \begin{multicols}{\c@lumncount}[%
-  \@ifundefined{p@stertitle}{}{\titlef@nt{\strut\p@stertitle\strut}\\[60pt]}%
-  \@ifundefined{p@stersubtitle}{}{\subtitlef@nt{\strut\p@stersubtitle\strut}\\[42pt]}%
+  \@ifundefined{p@stertitle}{}{\hspace*{12mm}\titlef@nt{\strut\p@stertitle\strut}\\[30pt]}%
+  \@ifundefined{p@stersubtitle}{}{\hspace*{12mm}\subtitlef@nt{\strut\p@stersubtitle\strut}\\[20pt]}%
                                  ]%
   %
-  \fontsize{32}{38}\selectfont
+  \fontsize{28}{40}\selectfont
 }
 
 
@@ -229,7 +225,7 @@
                           \edef\w@test{#2}\relax
                           \ifx\w@test\@empty{}\else\label{#2}\fi
                           \begin{minipage}{1.0\linewidth}
-                            \small\vspace{8pt}
+                            \normalsize\vspace{8pt}
                               {\bf \protect\figurename} {\bf \arabic{figure}.} #3
                           \end{minipage}
                           \nobreak\medskip\relax
