@@ -353,13 +353,74 @@ def save_predictions_csv(
     print(f"Predictions CSV saved to: {os.path.abspath(csv_path)}")
 
 
+def save_combined_confusion_matrices(cm_list, output_path):
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+    vmin = min(cm.min() for cm, _, _ in cm_list)
+    vmax = max(cm.max() for cm, _, _ in cm_list)
+
+    fig, axes = plt.subplots(
+        2,
+        2,
+        figsize=(18, 13),
+        constrained_layout=True,
+        gridspec_kw={"hspace": 0.05},
+    )
+    axes = axes.flatten()
+
+    for idx, ax in enumerate(axes):
+        cm, title, class_names = cm_list[idx]
+        im = ax.imshow(cm, cmap="viridis", vmin=vmin, vmax=vmax, aspect="equal")
+
+        norm_val = (cm - vmin) / (vmax - vmin + 1e-9)
+        for i in range(cm.shape[0]):
+            for j in range(cm.shape[1]):
+                rgba = plt.cm.viridis(norm_val[i, j])
+                luminance = 0.299 * rgba[0] + 0.587 * rgba[1] + 0.114 * rgba[2]
+                text_c = "white" if luminance < 0.5 else "black"
+                ax.text(
+                    j,
+                    i,
+                    str(cm[i, j]),
+                    ha="center",
+                    va="center",
+                    fontsize=20,
+                    fontweight="bold",
+                    color=text_c,
+                )
+
+        ax.set_xticks(range(len(class_names)))
+        ax.set_yticks(range(len(class_names)))
+        ax.set_xticklabels(class_names, fontsize=18)
+        ax.set_yticklabels(class_names, fontsize=18)
+        ax.set_xlabel("Predicted label", fontsize=18)
+        ax.set_ylabel("True label", fontsize=18)
+        ax.set_title(title, fontsize=20, fontweight="bold", pad=15)
+
+    cbar = fig.colorbar(im, ax=axes, shrink=0.92, pad=0.03)
+    cbar.ax.tick_params(labelsize=18)
+
+    fig.savefig(output_path, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+    print(f"Combined confusion matrices saved to: {os.path.abspath(output_path)}")
+
+
 if __name__ == "__main__":
     configs = [
-        ("geographic", "cnn"),
         ("random", "cnn"),
-        ("geographic", "gfm"),
         ("random", "gfm"),
+        ("geographic", "cnn"),
+        ("geographic", "gfm"),
     ]
+
+    title_map = {
+        ("random", "cnn"): "(a) Baseline CNN: Random Split",
+        ("random", "gfm"): "(b) Terramind: Random Split",
+        ("geographic", "cnn"): "(c) Baseline CNN: Geographic Split",
+        ("geographic", "gfm"): "(d) Terramind: Geographic Split",
+    }
+    class_names = ["0", "1"]
+    combined_cm_list = []
 
     for split_type, model_type in configs:
         checkpoint_path, best_val_loss, best_run_id = find_best_checkpoint(
@@ -405,6 +466,13 @@ if __name__ == "__main__":
             metrics["cm"],
             output_dir,
         )
+        combined_cm_list.append(
+            (
+                metrics["cm"],
+                title_map[(split_type, model_type)],
+                class_names,
+            )
+        )
         save_probability_histogram(
             results["labels"],
             results["probs"],
@@ -423,3 +491,10 @@ if __name__ == "__main__":
             model_type,
             output_dir,
         )
+
+    combined_output_path = os.path.join(
+        "..",
+        "50_evaluation",
+        "combined_confusion_matrices.png",
+    )
+    save_combined_confusion_matrices(combined_cm_list, combined_output_path)
