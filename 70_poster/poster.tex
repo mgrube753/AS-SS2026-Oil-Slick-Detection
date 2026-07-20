@@ -85,68 +85,31 @@
   \item \textbf{Data filtering} $\to$ find corrupt TIFF files \& imagery with >= 40\% of nodata
 \end{itemize}
 
-\myfigure{0}{filtering.png}{0.95}{}{Filtering of OilSlick's Sentinel-1 data subset. The blue bars represent the number of images before filtering, while the orange bars represent the number of images after filtering.}
+\myfigure{0}{filtering.png}{0.99}{}{Filtering of OilSlick's Sentinel-1 data subset. The blue bars represent the number of images before filtering, while the orange bars represent the number of images after filtering.}
 
 \columnbreak
 \section{Results}
-\myfigure{0}{./val_loss_gfm_random.png}{0.99}{}{Illustration of the grid search wrt.\,validation loss curves for the \textbf{Terramind} model on the \textit{Random} split -- to further find the best configuration based on the lowest validation loss.}
-% \begin{center}
-%   \normalsize
-%   \renewcommand{\arraystretch}{1.15}
-%   \begin{tabular*}{.95\linewidth}{@{\extracolsep{\fill}} l l c c c c c @{}}
-%     \toprule
-%     \textbf{Split} & \textbf{Model} & \textbf{Class} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} & \textbf{n} \\
-%     \midrule
-%     \multirow{2}{*}{Geographic}
-%       & \multirow{2}{*}{CNN}
-%       & No Slick & 0.7925 & 0.5600 & 0.6562 & 75 \\
-%       & & \textit{Oil Slick} & 0.6250 & 0.8333 & 0.7143 & 66 \\[5pt]
-%     \multirow{2}{*}{Geographic}
-%       & \multirow{2}{*}{GFM}
-%       & No Slick & \textbf{0.8333} & 0.5333 & 0.6504 & 75 \\
-%       & & \textit{Oil Slick} & 0.6237 & 0.8788 & 0.7296 & 66 \\[5pt]
-%     \multirow{2}{*}{Random}
-%       & \multirow{2}{*}{CNN}
-%       & No Slick & 0.6957 & \textbf{0.6612} & \textbf{0.6780} & 121 \\
-%       & & \textit{Oil Slick} & \textbf{0.7285} & 0.7586 & 0.7432 & 145 \\[5pt]
-%     \multirow{2}{*}{Random}
-%       & \multirow{2}{*}{GFM}
-%       & No Slick & 0.7895 & 0.4959 & 0.6091 & 121 \\
-%       & & \textit{Oil Slick} & 0.6789 & \textbf{0.8897} & \textbf{0.7701} & 145 \\
-%     \bottomrule
-%   \end{tabular*}
-%   \captionof{table}{Evaluation results on the test sets across both geographic \& random splits for each model. The best results for each class (\textit{No Slick}, \textit{Oil Slick}) are highlighted in bold (per metric).}
-% \end{center}
+\myfigure{0}{./val_loss_gfm_random.png}{0.99}{}{Example of the grid search validation loss curves for the \textbf{Terramind} model (\textit{Random} split) -- to find the best configuration for evaluation based on the lowest validation loss.}
 
-\subsection{Test Set-based Evaluation} \vspace{-1em}
-\begin{center}
-  \begin{tabular}{cc}
-    \includegraphics[width=0.49\linewidth]{../50_evaluation/random\_split/cnn/results/confusion_matrix.png} &
-    \includegraphics[width=0.49\linewidth]{../50_evaluation/random\_split/gfm/results/confusion_matrix.png} \\
-    \normalsize (a) Baseline CNN: Random Split &
-    \normalsize (b) Terramind: Random Split \\
-    \includegraphics[width=0.49\linewidth]{../50_evaluation/geographic\_split/cnn/results/confusion_matrix.png} &
-    \includegraphics[width=0.49\linewidth]{../50_evaluation/geographic\_split/gfm/results/confusion_matrix.png} \\
-    \normalsize (c) Baseline CNN: Geographic Split &
-    \normalsize (d) Terramind: Geographic Split \\
-  \end{tabular}
-  \captionof{figure}{Confusion matrices for the individual test sets across random \& geographic splits for each final model -- obtained from the 4 grid search runs.}
-\end{center}
+\vspace{.5em}
+\subsection{Test Set-based Evaluation}
+
+\myfigure{0}{../50_evaluation/combined_confusion_matrices.png}{0.99}{}{Confusion matrices for the individual test sets across random \& geographic splits for each final model -- obtained from the 4 grid search runs.}
 
 \columnbreak
 
 \subsection{Example Failure Cases} \vspace{-1em}
 
-\myfigure{0}{../50_evaluation/random\_split/cnn/results/failure\_analysis/false\_negatives/fn\_251.png}{0.77}{}{Example SAR chip from the \textit{Random} test set, classified as \textit{No Slick} by the CNN baseline, which is a \textbf{False Negative (FN)}.} \vspace{-.3em}
+\myfigure{0}{../50_evaluation/random\_split/cnn/results/failure\_analysis/false\_negatives/fn\_251.png}{0.79}{}{Example SAR chip from the \textit{Random} test set, classified as \textit{No Slick} by the CNN baseline, which is a \textbf{False Negative (FN)}.} \vspace{-.3em}
 
-\myfigure{0}{../50\_evaluation/geographic\_split/gfm/results/failure\_analysis/false\_positives/fp_18.png}{0.77}{}{Example SAR chip from the \textit{Geographic} test set, classified as \textit{Slick} by the Terramind model, which is a \textbf{False Positive (FP)}.}
+\myfigure{0}{../50\_evaluation/geographic\_split/gfm/results/failure\_analysis/false\_positives/fp_18.png}{0.79}{}{Example SAR chip from the \textit{Geographic} test set, classified as \textit{Slick} by the Terramind model, which is a \textbf{False Positive (FP)}.}
 
 \section{Conclusion \& Future Work}
 \begin{itemize}
-  \item \textbf{RQ1:} Oil Slick F1 scores $\sim$\textbf{0.71--0.77}, only mild OOD drop ($\sim$\textbf{0.03--0.04}) \vspace{.3em} % surprisingly robust across regions (see F1 score column for Oil Slick (geo cnn vs random cnn / geo gfm vs random gfm)). so, ML/DL can be used to detect oil slicks in SAR imagery across several regions
-  \item \textbf{RQ2:} GFM $\to$ higher Slick F1 ($\uparrow$ \textbf{0.03}), lower No-Slick F1 ($\downarrow$ \textbf{0.07}) \vspace{.2em}\\$\to$ \textit{no clear improvement over CNN} $\mid$ XAI not applied (time) \vspace{.3em} % see GFM random and CNN random; GFM geo and CNN geo even differ less
+  \item \textbf{RQ1:} Oil Slick F1 scores $\sim$\textbf{0.71--0.77}, only mild OOD drop ($\sim$\textbf{0.03--0.04}) \vspace{.5em} % surprisingly robust across regions (see F1 score column for Oil Slick (geo cnn vs random cnn / geo gfm vs random gfm)). so, ML/DL can be used to detect oil slicks in SAR imagery across several regions
+  \item \textbf{RQ2:} GFM $\to$ higher Slick F1 ($\uparrow$ \textbf{0.03}), lower No-Slick F1 ($\downarrow$ \textbf{0.07}) \vspace{.3em}\\$\to$ \textit{no clear improvement over CNN} $\mid$ XAI not applied (time) \vspace{.4em} % see GFM random and CNN random; GFM geo and CNN geo even differ less
   \item \textbf{Limitations:} All models trade precision for recall (Oil Slick) % recall > precision for each config; random CNN is more balanced and shows highest Slick precision with 0.7285, but lowest Slick recall with 0.7586 --> F1=0.7432
-   $\to$ \textit{False alarms} on lookalikes as key failure mode $\mid$ Dataset quality \textit{(invalid samples)} \vspace{.3em} % even after filtering <= -50db imagery / >= 40% nodata / std=0.0 imagery (corrupt)
+   $\to$ \textit{False alarms} on lookalikes as key failure mode $\mid$ Dataset quality \textit{(invalid samples)} \vspace{.4em} % even after filtering <= -50db imagery / >= 40% nodata / std=0.0 imagery (corrupt)
   \item \textbf{Future Work:} XAI-driven failure analysis to \textit{interpret} model behavior on lookalikes, and experimenting on (larger) SAR datasets with less invalid samples % since we are no domain-specific experts, we cannot tell why invalid samples still remain in the dataset after filtering
 \end{itemize}
 
