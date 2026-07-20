@@ -159,7 +159,7 @@ A filtered dataset size of 1196 is still small for training ML/DL models, which 
 \subsection{FAIR Data, Code and Models}
 \subsubsection{How are the produced data, code, and models made findable?} The code and checkpoints of the trained models are available on the proposed GitHub repository, including documentation for each Python file. 
 \subsubsection{How are they made Accessible? (Trusted repositories, terms of use)} Via the GitHub repository, which is openly accessible and are licensed under CC-BY-4.0 as the dataset itself.
-\subsubsection{How are they made Interoperable? (Community standards, open formats)} Python and Jupyter notebooks are the core of the project. PyTorch model training checkpoints in the .pt format are saved for reuse. Results are saved as CSV files to enable easy analysis.
+\subsubsection{How are they made Interoperable? (Community standards, open formats)} Python and Jupyter notebooks are the core of the project. PyTorch model checkpoints in the .pt format are saved for reuse. Results are saved as CSV files to enable easy analysis.
 \subsubsection{How are they made reusable? (Documentation, licensing)}  Documentation and code comments are provided in the GitHub repository to ensure proper understanding and reuse of the code. Since the OilSlick dataset is used for the project, the same CC-BY-4.0 license applies to the code and models.
 \subsubsection{How is the source of the model documented (history, reuse of prior models, data sources)?} The baseline model is solely hand-crafted and trained from scratch on the provided dataset using torch\,/\,torchvision. Terramind is a pre-trained GFM loaded from the TerraTorch library, and fine-tuned on the same dataset. The Sentinel-1 SAR data subset from OilSlick is sourced from the WaterBench dataset, which is openly available on Hugging Face, as stated in Section \ref{sec:data}.
 \subsubsection{How are all contributors acknowledged or credited (e.g., CRediT taxonomy)?} The contributors are listed as authors in the ODE document. The contributions are distributed as follows:\subsection*{Malte}
@@ -197,5 +197,8 @@ A filtered dataset size of 1196 is still small for training ML/DL models, which 
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{../70_poster/refs}
+
+\section*{AI Usage Disclosure}
+In this seminar project, our team used generative AI for minor to major language improvement in the ODE report, README and code documentation files. Generative AI was also used for assisted code writing (e.g., for data analysis in this domain-specific context). All information such as tasks, project structuring, requirements and the project ideas were processed and verified by a human.
 
 \end{document}
