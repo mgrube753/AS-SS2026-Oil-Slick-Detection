@@ -1,6 +1,6 @@
 # [eval.py](../30_experiments/eval.py)
 
-Evaluation script that finds the best checkpoint per configuration from MLflow logs, runs test set inference, and computes classification metrics, visualizations, and result exports.
+Evaluation script that finds the best checkpoint per configuration (4 in total) from MLflow logs, runs test set inference, and computes classification metrics, visualizations, and result exports.
 
 ## Overview
 
@@ -20,13 +20,15 @@ A comprehensive evaluation module for the 4 best-performing models (BaselineCNN 
 
 * **`run_model_inference(model, test_loader)`** Executes forward passes on test loader with no gradient computation. Applies sigmoid activation and 0.5 threshold for binary predictions. **Returns:** tuple of (all_labels, all_preds, all_probs).
 
-* **`save_confusion_matrix(cm, output_dir)`** Generates confusion matrix plot using scikit-learn's `ConfusionMatrixDisplay` and saves as `confusion_matrix.png`.
+* **`save_confusion_matrix(cm, output_dir)`** Generates confusion matrix plot using scikit-learn's `ConfusionMatrixDisplay` and saves as `confusion_matrix.png` in the specified model directory.
 
 * **`save_probability_histogram(labels, probs, output_dir)`** Creates dual histogram showing predicted probability distributions for negative and positive samples with decision threshold line at 0.5. Saves as `probability_histogram.png`.
 
 * **`save_classification_report(labels, preds, output_dir)`** Generates formatted classification report with precision, recall, and F1 per class. Saves as `classification_report.txt`.
 
 * **`save_predictions_csv(labels, preds, probs, split_type, model_type, output_dir)`** Exports per-sample predictions to CSV with columns: index, true_label, pred_label, probability, correct. Saves as `test_predictions.csv`.
+
+* **`save_combined_confusion_matrices(cm_list, output_path)`** Creates a 2×2 figure of all four confusion matrices with one shared viridis colorbar. Text color is chosen per cell via luminance threshold (white on dark, black on light). Saves as `combined_confusion_matrices.png`.
 
 ## Dependencies
 

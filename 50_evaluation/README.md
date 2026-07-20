@@ -23,6 +23,7 @@ Every subfolder follows the same pattern:
 ```bash
 50_evaluation/
 ├── README.md
+├── combined_confusion_matrices.png # all four models' confusion matrices in one figure
 ├── geographic_split/
 │   ├── cnn/
 │   │   └── results/
