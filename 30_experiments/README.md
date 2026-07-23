@@ -24,7 +24,7 @@ The experiments follow a systematic grid search over hyperparameters for both mo
 
 **BaselineCNN (CNN)**
 
-- Small 2-layer convolutional network trained from scratch
+- Small 4-layer convolutional network trained from scratch
 - Input: 2-channel SAR images (VV + VH), resized to 224×224
 - Output: Binary classification (oil slick / no slick)
 - Kaiming weight initialization

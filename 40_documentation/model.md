@@ -11,10 +11,10 @@ A comprehensive model module containing two distinct architectures for binary oi
 ### Weight Initialization
 
 * **`init_kaiming_weights(m)`** Custom weight initialization function:
-  - **Conv2d layers**: Kaiming normal initialization (fan_out, relu)
-  - **Linear layers (multi-output)**: Kaiming normal initialization (relu)
-  - **Linear layers (single output)**: Xavier normal initialization
-  - **Biases**: Constant initialization to 0
+  * **Conv2d layers**: Kaiming normal initialization (fan_out, relu)
+  * **Linear layers (multi-output)**: Kaiming normal initialization (relu)
+  * **Linear layers (single output)**: Xavier normal initialization
+  * **Biases**: Constant initialization to 0
   Ensures stable gradient flow and faster convergence
 
 ## Model Architectures
@@ -42,15 +42,17 @@ A lightweight convolutional neural network trained from scratch on SAR imagery.
 | Linear | Output layer | 64→1 | [B, 1] |
 
 **Key Features:**
-- Lightweight design for computational efficiency
-- Only 2 convolutional blocks (16, 32 channels)
-- Global average pooling for translation invariance
-- Dropout for regularization
-- Single output logit (binary classification via sigmoid)
+
+* Lightweight design for computational efficiency
+* Only 2 convolutional blocks (16, 32 channels)
+* Global average pooling for translation invariance
+* Dropout for regularization
+* Single output logit (binary classification via sigmoid)
 
 **Parameters:**
-- `num_classes`: Number of output classes (default: 2)
-- `in_channels`: Number of input channels (default: 2 for VV, VH)
+
+* `num_classes`: Number of output classes (default: 2)
+* `in_channels`: Number of input channels (default: 2 for VV, VH)
 
 **Initialization:** Kaiming normal with relu nonlinearity
 
@@ -80,17 +82,19 @@ Transfer learning approach using a pre-trained geospatial foundation model backb
 | Linear | Output layer | 64→1 | [B, 1] |
 
 **Key Features:**
-- Leverages pre-trained geospatial knowledge
-- Frozen backbone prevents catastrophic forgetting
-- Custom trainable head for task-specific fine-tuning
-- Flexible handling of backbone output shapes
-- Mean pooling for 3D feature tensors
+
+* Leverages pre-trained geospatial knowledge
+* Frozen backbone prevents catastrophic forgetting
+* Custom trainable head for task-specific fine-tuning
+* Flexible handling of backbone output shapes
+* Mean pooling for 3D feature tensors
 
 **Parameters:**
-- `num_classes`: Number of output classes (default: 2)
-- `freeze_backbone`: Whether to freeze backbone weights (default: True)
 
-**Initialization:** Kaiming normal for head layers only
+* `num_classes`: Number of output classes (default: 2)
+* `freeze_backbone`: Whether to freeze backbone weights (default: True)
+
+**Initialization:** Kaiming normal for head layers only, and Xavier normal for single output layer
 
 ## Model Comparison
 
@@ -99,7 +103,6 @@ Transfer learning approach using a pre-trained geospatial foundation model backb
 | **Training Strategy** | From scratch | Transfer learning |
 | **Backbone** | Custom CNN | Pre-trained TerraMind |
 | **Backbone Frozen** | N/A | Yes |
-| **Parameters** | ~50K | ~50K (head only) |
 | **Training Epochs** | 32 | 16 |
 | **Learning Rate Range** | 1e-4 to 1e-3 | 5e-4 to 3e-3 |
 | **Weight Decay Range** | 1e-4 to 1e-2 | 1e-5 to 1e-3 |
@@ -108,6 +111,7 @@ Transfer learning approach using a pre-trained geospatial foundation model backb
 ## Forward Pass Details
 
 ### BaselineCNN Forward Pass
+
 1. Input: [B, 2, 224, 224]
 2. Feature extraction via convolutional blocks
 3. Global average pooling to [B, 32]
@@ -115,6 +119,7 @@ Transfer learning approach using a pre-trained geospatial foundation model backb
 5. Output: [B, 1] (logit for binary classification)
 
 ### TerraMindClassifier Forward Pass
+
 1. Input: [B, 2, 224, 224]
 2. Backbone feature extraction → embeddings
 3. Handle output shape (dict/list/tuple conversion)
@@ -125,9 +130,10 @@ Transfer learning approach using a pre-trained geospatial foundation model backb
 ## Loss Function
 
 Both models use **BCEWithLogitsLoss** (Binary Cross-Entropy with Logits):
-- Combines sigmoid activation with BCE loss (numerically stable)
-- Supports `pos_weight` for class imbalance handling
-- Single output logit per sample
+
+* Combines sigmoid activation with BCE loss (numerically stable)
+* Supports `pos_weight` for class imbalance handling
+* Single output logit per sample
 
 ## Dependencies
 
